@@ -1,36 +1,11 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v5 -->
+<!-- Настрелял на Мастера? — версия v6 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Настрелял на Мастера?</title>
-
-<!-- Open Graph — превью для WhatsApp и других мессенджеров -->
-<meta property="og:title" content="Настрелял на Мастера?">
-<meta property="og:description" content="Требования, нормы и условия для получения 1 разряда, КМС и МС по практической стрельбе (пистолет/револьвер, взрослые мужчины и женщины)">
-<meta property="og:image" content="https://ramzesikus.github.io/MasterFlomaster/logo_640x360.png">
-<meta property="og:url" content="https://t.me/Maaster_floomaster_bot/master">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Настрелял на Мастера?">
-<meta name="twitter:description" content="Требования, нормы и условия для получения 1 разряда, КМС и МС по практической стрельбе (пистолет/револьвер, взрослые мужчины и женщины)">
-<meta name="twitter:image" content="https://ramzesikus.github.io/MasterFlomaster/logo_640x360.png">
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-  // Если страницу открыли НЕ изнутри Telegram (например, встроенный браузер
-  // WhatsApp) — сразу перекидываем на t.me-ссылку, которая откроет мини-эпп
-  // штатно. Внутри самого Telegram initData всегда непустая, редирект не сработает.
-  (function(){
-    try{
-      var tgInit = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData;
-      if(!tgInit){
-        window.location.replace("https://t.me/Maaster_floomaster_bot/master");
-      }
-    }catch(e){}
-  })();
-</script>
 <style>
   :root{
     --bg: #14161a;
@@ -67,7 +42,7 @@
     background:var(--panel-2); color:var(--text-dim); display:flex; align-items:center; justify-content:center;
     cursor:pointer; flex:none;
   }
-  .icon-btn svg{ width:16px; height:16px; }
+  .icon-btn svg{ width:18px; height:18px; }
   .icon-btn:active{ transform:scale(0.94); }
 
   .card{
@@ -113,6 +88,11 @@
   .dd-btn{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; line-height:1.3; }
   .dd-btn svg{ display:none; } /* стрелка уже нарисована фоном, эта — про запас, скрыта */
   #compOptionsList .opt-btn{ width:100%; text-align:left; }
+  .group-sep{
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim);
+    text-align:center; margin:14px 0 6px; font-weight:700;
+  }
+  .group-sep:first-child{ margin-top:2px; }
 
   .result-eyebrow{
     font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;
@@ -203,7 +183,7 @@
     <h1>Настрелял на Мастера?</h1>
     <div class="head-icons">
       <button class="icon-btn" id="infoBtn" aria-label="О приложении">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="11"/><circle cx="12" cy="7.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="11" x2="12" y2="17.5"/><circle cx="12" cy="6.8" r="1.6" fill="currentColor" stroke="none"/></svg>
       </button>
       <button class="icon-btn" id="feedbackBtn" aria-label="Написать разработчику">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5.6A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 1 1 21 11.5z"/></svg>
@@ -214,7 +194,7 @@
   <span class="result-eyebrow" style="color:var(--brass);">Кто я и что хочу?</span>
   <div class="card">
     <div class="field">
-      <span class="field-label">Пол:</span>
+      <span class="field-label">Пол</span>
       <div class="btn-row" id="sexRow">
         <button class="opt-btn" data-group="sex" data-value="m">Мужчина</button>
         <button class="opt-btn" data-group="sex" data-value="f">Женщина</button>
@@ -222,7 +202,15 @@
     </div>
 
     <div class="field">
-      <span class="field-label">Текущий разряд / звание:</span>
+      <span class="field-label">Из чего стреляю</span>
+      <button class="opt-btn dd-btn" id="weaponSelectBtn" type="button">
+        <span id="weaponSelectLabel"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Текущий разряд / звание</span>
       <div class="btn-row" id="curRow" style="gap:5px; flex-wrap:nowrap;">
         <button class="opt-btn" data-group="cur" data-value="0" style="flex:1; padding-left:6px; padding-right:6px; white-space:nowrap;">&lt;1 разряда</button>
         <button class="opt-btn" data-group="cur" data-value="1" style="flex:1; padding-left:6px; padding-right:6px; white-space:nowrap;">1 разряд</button>
@@ -232,7 +220,7 @@
     </div>
 
     <div class="field">
-      <span class="field-label">Хочу получить:</span>
+      <span class="field-label">Хочу получить</span>
       <div class="btn-row" id="targetRow">
         <button class="opt-btn" data-group="target" data-value="r1">1 разряд</button>
         <button class="opt-btn" data-group="target" data-value="kms">КМС</button>
@@ -241,7 +229,7 @@
     </div>
 
     <div class="field">
-      <span class="field-label">На соревновании:</span>
+      <span class="field-label">На соревновании</span>
       <button class="opt-btn dd-btn" id="compSelectBtn" type="button">
         <span id="compSelectLabel"></span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
@@ -263,7 +251,7 @@
       <p><b>Источники:</b><br>
       1) Положение о Единой всероссийской спортивной классификации (утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510; действует с 01.09.2025).<br>
       2) Приложение №54 к приказу Минспорта России от 09.04.2026 №299 («Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”»; действует с 19.06.2026).</p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v5</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v6</p>
     </div>
   </div>
 </div>
@@ -278,6 +266,17 @@
       <textarea id="feedbackText" placeholder="Что не так или что добавить..."></textarea>
       <button class="modal-btn" id="feedbackSend">Отправить</button>
       <div class="modal-status" id="feedbackStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WEAPON PICKER MODAL ===== -->
+<div class="modal-overlay" id="weaponModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="weaponModal">×</button>
+    <h3 class="modal-title">Из чего стреляю</h3>
+    <div class="modal-body">
+      <div class="btn-row" id="weaponOptionsList" style="flex-direction:column;"></div>
     </div>
   </div>
 </div>
@@ -311,14 +310,14 @@ const CUR_INDEX_TO_KEY = ["below","r1","kms","ms"];
 const PREREQ_LABEL = { r1:null, kms:null, ms:"КМС" };
 
 const JUDGES = {
-  r1:  "2 судьи 1-й категории + 1 судья 2-й категории",
-  kms: "1 судья всероссийской категории + 2 судьи 1-й категории",
+  r1:  "2 судьи 1 категории + 1 судья 2 категории",
+  kms: "1 судья всероссийской категории + 2 судьи 1 категории",
   ms:  "3 судьи всероссийской категории"
 };
 
 const REGIONS_ALLRU = {
-  short: "23 и больше — целиком, 6–22 включительно — половинка",
-  explain: "<p>«Половинка» — это не полный зачёт условия, а половина нормы. Чтобы получить разряд/звание при половинке, норму нужно выполнить <b>дважды в течение 3 лет</b>, на разных соревнованиях, и каждый раз — при участии от 6 до 22 регионов включительно.</p><p>Считаются регионы, представленные именно в официальном зачёте — остальные участники соревнования не в счёт.</p>"
+  short: "23 и больше (либо 6–22 по «правилу половинок»)",
+  explain: "<p>В соревнованиях должны участвовать спортсмены не менее чем из 25% регионов России (то есть не менее чем из 23 регионов).</p><p>Если это условие не выполняется, применяется <b>«правило половинок»</b>: допускается участие спортсменов не менее чем из 6 регионов, но все прочие требования/условия нужно выполнить на <b>двух разных соревнованиях</b> с перерывом не более трёх лет.</p><p>Считаются регионы, представленные именно в официальном зачёте — остальные участники соревнования не в счёт.</p>"
 };
 const REGIONS_FO = {
   short: "не менее 50% регионов округа",
@@ -328,55 +327,55 @@ const REGIONS_FO = {
 const COND_RESIDENCY = {
   short: "Нужно быть приписанным к региону-организатору соревнования.",
   title: "Приписка к региону",
-  explain: "<p>На региональных соревнованиях в официальный зачёт входят только спортсмены, приписанные к региону-организатору — тому, чьё это соревнование, а не к региону, где физически расположена площадка (стрелковый комплекс в одном регионе нередко принимает соревнования соседнего).</p><p>Например, стрелок из Воронежской области может физически выступить на чемпионате Москвы, но не в официальном зачёте москвичей — результат не попадёт в официальный протокол, и разряд по нему не присвоят.</p>"
+  explain: "<p>На региональных соревнованиях в официальный зачёт входят только спортсмены, приписанные к региону-организатору — тому, чьё это соревнование, а не к региону, где физически расположена площадка (стрелковый комплекс в одном регионе нередко принимает соревнования соседнего).</p><p>Например, стрелок из Воронежской области может физически выступить на чемпионате Москвы, но не в официальном зачёте москвичей — результат не попадёт в официальный протокол, и разряд/звание по нему не присвоят.</p>"
 };
 const COND_APPLICATION = {
   short: "Нужно быть включённым в региональную заявку (её готовит региональное отделение федерации).",
   title: "Региональная заявка",
-  explain: "<p>Участвовать в соревновании можно и без региональной заявки. Но в официальный зачёт (и, соответственно, на разряд) попадают только те, кто в неё включён. Заявку подаёт региональное отделение федерации, до старта.</p>"
+  explain: "<p>Участвовать в соревновании можно и без региональной заявки. Но в официальный зачёт (и, соответственно, на разряд/звание) попадают только те, кто в неё включён. Заявку подаёт региональное отделение федерации.</p>"
 };
 
 // tier: 'residency' (региональный уровень — приписка) | 'application' (межрегиональный+ — заявка)
 const COMPETITIONS = {
   r1: [
-    { id:"subject_champ", label:"Чемпионат субъекта РФ", tier:"residency", minParticipants:4,
+    { id:"subject_champ", label:"Чемпионат субъекта РФ", tier:"residency", group:"regional", minParticipants:4,
       personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
-    { id:"subject_cup", label:"Финал Кубка субъекта (кроме Москвы и Санкт-Петербурга)", tier:"residency", minParticipants:4,
+    { id:"subject_cup", label:"Финал Кубка субъекта (кроме Москвы и Санкт-Петербурга)", tier:"residency", group:"regional", minParticipants:4,
       personal:{ place:null, percent:{m:75, f:65} }, team:null, duel:null, regions:null, need2ms:false },
-    { id:"subject_other", label:"Другие соревнования субъекта РФ", blocked:true,
+    { id:"subject_other", label:"Другие соревнования субъекта РФ", group:"regional", blocked:true,
       blockedMessage:"Недавние изменения ЕВСК убрали возможность получить 1 разряд на этом статусе — для взрослых в пистолете/револьвере норма здесь больше не предусмотрена." },
-    { id:"msk_spb_champ", label:"Чемпионат Москвы / Санкт-Петербурга", tier:"residency", minParticipants:4,
+    { id:"msk_spb_champ", label:"Чемпионат Москвы / Санкт-Петербурга", tier:"residency", group:"regional", minParticipants:4,
       personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
-    { id:"fo_champ", label:"Чемпионат федерального округа", tier:"application", minParticipants:4,
+    { id:"fo_champ", label:"Чемпионат федерального округа", tier:"application", group:"interregional", minParticipants:4,
       personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
-    { id:"interregional_other", label:"Другие межрегиональные соревнования", tier:"application", minParticipants:4,
+    { id:"interregional_other", label:"Другие межрегиональные соревнования", tier:"application", group:"interregional", minParticipants:4,
       personal:{ place:null, percent:{m:75, f:65} }, team:null, duel:null, regions:null, need2ms:false },
   ],
   kms: [
-    { id:"msk_spb_champ", label:"Чемпионат Москвы / Санкт-Петербурга", tier:"residency", minParticipants:6,
+    { id:"msk_spb_champ", label:"Чемпионат Москвы / Санкт-Петербурга", tier:"residency", group:"regional", minParticipants:6,
       personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:85, f:75} }, team:{place:"1–2"}, duel:{place:"1–2"},
       regions:null, need2ms:true },
-    { id:"fo_champ", label:"Чемпионат федерального округа", tier:"application", minParticipants:6,
+    { id:"fo_champ", label:"Чемпионат федерального округа", tier:"application", group:"interregional", minParticipants:6,
       personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:85, f:75} }, team:{place:"1–2"}, duel:{place:"1–2"},
       regions:REGIONS_FO, need2ms:true },
-    { id:"russia_champ", label:"Чемпионат России (ЧР)", tier:"application", minParticipants:6,
+    { id:"russia_champ", label:"Чемпионат России (ЧР)", tier:"application", group:"allrussian", minParticipants:6,
       personal:{ place:{m:"1–11", f:"1–8"}, percent:{m:75, f:65} }, team:{place:"1–2"}, duel:{place:"1–2"},
       regions:REGIONS_ALLRU, need2ms:true },
-    { id:"russia_cup", label:"Финал Кубка России (ФКР)", tier:"application", minParticipants:6,
+    { id:"russia_cup", label:"Финал Кубка России (ФКР)", tier:"application", group:"allrussian", minParticipants:6,
       personal:{ place:{m:"1–8", f:"1–6"}, percent:{m:75, f:65} }, team:{place:"1–2"}, duel:{place:"1–2"},
       regions:REGIONS_ALLRU, need2ms:true },
-    { id:"allru_other", label:"Всероссийское соревнование (кроме ЧР и ФКР)", tier:"application", minParticipants:6,
+    { id:"allru_other", label:"Всероссийское соревнование (кроме ЧР и ФКР)", tier:"application", group:"allrussian", minParticipants:6,
       personal:{ place:{m:"1–5", f:"1–4"}, percent:{m:80, f:70} }, team:{place:"1–2"}, duel:{place:"1–2"},
       regions:REGIONS_ALLRU, need2ms:true },
   ],
   ms: [
-    { id:"russia_champ", label:"Чемпионат России (ЧР)", tier:"application", minParticipants:6,
+    { id:"russia_champ", label:"Чемпионат России (ЧР)", tier:"application", group:"allrussian", minParticipants:6,
       personal:{ place:{m:"1–6", f:"1–4"}, percent:{m:85, f:75} }, team:{place:"1"}, duel:{place:"1"},
       regions:REGIONS_ALLRU, need2ms:true },
-    { id:"russia_cup", label:"Финал Кубка России (ФКР)", tier:"application", minParticipants:6,
+    { id:"russia_cup", label:"Финал Кубка России (ФКР)", tier:"application", group:"allrussian", minParticipants:6,
       personal:{ place:{m:"1–5", f:"1–3"}, percent:{m:85, f:75} }, team:{place:"1"}, duel:{place:"1"},
       regions:REGIONS_ALLRU, need2ms:true },
-    { id:"allru_other", label:"Всероссийское соревнование (кроме ЧР и ФКР)", tier:"application", minParticipants:6,
+    { id:"allru_other", label:"Всероссийское соревнование (кроме ЧР и ФКР)", tier:"application", group:"allrussian", minParticipants:6,
       personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:90, f:80} }, team:{place:"1"}, duel:{place:"1"},
       regions:REGIONS_ALLRU, need2ms:true },
   ]
@@ -385,16 +384,16 @@ const COMPETITIONS = {
 const EXPLAIN = {
   zachet: {
     title: "Что такое «зачёт»",
-    body: "<p><b>Зачёт</b> — конкретная комбинация класса, пола и формата (личный/командный/дуэльный), за которую отдельно распределяются места. Например, PRD «Мужчины» и PRD «Женщины» — разные зачёты, даже на одном соревновании.</p><p>Зачёты бывают официальными и неофициальными. Официальный — тот, что прямо указан в положении о соревновании и по которому присваиваются разряды и звания. Неофициальный — это не только дополнительное распределение мест (например, по возрасту), но и результаты спортсменов, которые вообще не входят в официальный зачёт. Например, стрелок из Воронежской области, выступающий на чемпионате Москвы, физически стреляет, но идёт вне официального зачёта москвичей — в официальный протокол не попадает, и разряд по этому старту не получает.</p><p>Условие по числу участников/команд считается именно внутри официального зачёта.</p>"
+    body: "<p><b>Зачёт</b> — конкретная комбинация класса, пола и формата (личный/командный/дуэльный), за которую отдельно распределяются места. Например, <i>«Личный зачёт, PRD, женщины»</i> или <i>«Командный зачёт, OPN, мужчины+женщины»</i> — разные зачёты, даже на одном соревновании.</p><p>Зачёты бывают официальными и неофициальными.</p><p><b>Официальный</b> — тот, что прямо указан в положении о соревновании и по которому присваиваются разряды и звания.</p><p><b>Неофициальный</b> — тот, в который входят спортсмены, не включённые в официальный зачёт. Например, стрелок из Воронежской области, выступающий на чемпионате Москвы, физически может участвовать в этом матче, но идёт вне официального зачёта москвичей — в официальный протокол не попадает и разряд/звание по итогам не получает. В рамках неофициальных зачётов возможно произвольное распределение призовых мест (например, по возрастным группам).</p><p>Условие по числу участников/команд считается именно внутри официального зачёта.</p>"
   },
   regions: { title: "Условие по регионам", body: "" }, // заполняется динамически
   twoms: {
     title: "Условие «2 МС на соревновании»",
-    body: "<p>Речь про <b>всё соревнование целиком</b>, а не только про твой зачёт — эти два МС (или МСМК) могут выступать в любом зачёте того же старта, но обязательно в официальном.</p><p>И процент от победителя они должны набрать в своём личном зачёте — тот же процент, что требуется для присвоения на этом статусе соревнования.</p>"
+    body: "<p>Речь про <b>всё соревнование целиком</b>, а не только про твой зачёт — эти два МС (или МСМК) могут выступать в любом зачёте того же соревнования, но обязательно в официальном.</p><p>И процент от победителя они должны набрать в своём личном зачёте — тот же процент, что требуется для присвоения на этом статусе соревнования.</p>"
   },
   crosspercent: {
     title: "Почему нужен ещё и личный процент",
-    body: "<p>В командных и дуэльных зачётах места распределяются только по занятому месту, без учёта процента. Но ЕВСК отдельно требует, чтобы в этом же соревновании у спортсмена был личный результат — тот же процент от победителя, что нужен для его личного разряда/звания на этом статусе.</p><p>Без личного процента место в команде/дуэли разряд не даёт.</p>"
+    body: "<p>В командных и дуэльных зачётах места распределяются только по занятому месту, без учёта процента. Но ЕВСК отдельно требует, чтобы в этом же соревновании у спортсмена был личный результат — тот же процент от победителя, что нужен для его личного разряда/звания на этом статусе.</p><p>Без личного процента место в команде/дуэли разряд/звание не даёт.</p>"
   },
   cond_residency: { title: COND_RESIDENCY.title, body: COND_RESIDENCY.explain },
   cond_application: { title: COND_APPLICATION.title, body: COND_APPLICATION.explain }
@@ -415,7 +414,7 @@ try{
    время видно прямо в чате бота), без лога того, что человек выбирает. */
 const ANALYTICS_BOT_TOKEN = "8976902599:AAFpFT77uvYgh7niWvcq1xWkx5AYYynkEkw";
 const ANALYTICS_CHAT_ID = "-5443571059";
-const APP_VERSION = "v5";
+const APP_VERSION = "v6";
 
 function getDeviceLabel(){
   try{
@@ -488,7 +487,11 @@ function openExplain(key, dynamicBody, dynamicTitle){
 }
 
 /* ============ STATE ============ */
-const state = { sex:"m", cur:"0", target:"r1", format:"personal", comp:null };
+const state = { sex:"m", cur:"0", weapon:"pistol_revolver", target:"r1", format:"personal", comp:null };
+
+const WEAPONS = [
+  { id:"pistol_revolver", label:"Пистолет/револьвер" }
+];
 let explainRegistry = [];
 
 function setActive(group, value){
@@ -520,15 +523,43 @@ setActive('sex', state.sex);
 setActive('cur', state.cur);
 setActive('target', state.target);
 
+const weaponSelectBtn = document.getElementById('weaponSelectBtn');
+const weaponSelectLabel = document.getElementById('weaponSelectLabel');
+weaponSelectLabel.textContent = WEAPONS.find(w=>w.id===state.weapon).label;
+weaponSelectBtn.addEventListener('click', ()=>{
+  const optsList = document.getElementById('weaponOptionsList');
+  optsList.innerHTML = WEAPONS.map(w=>{
+    const active = w.id === state.weapon ? ' active' : '';
+    return `<button class="opt-btn${active}" data-weapon-id="${w.id}">${w.label}</button>`;
+  }).join('');
+  openModal('weaponModal');
+});
+document.getElementById('weaponOptionsList').addEventListener('click', (e)=>{
+  const b = e.target.closest('.opt-btn[data-weapon-id]');
+  if(!b) return;
+  state.weapon = b.dataset.weaponId;
+  weaponSelectLabel.textContent = b.textContent;
+  closeModal('weaponModal');
+});
+
 const compSelectBtn = document.getElementById('compSelectBtn');
 const compSelectLabel = document.getElementById('compSelectLabel');
+const GROUP_LABELS = { regional:"Региональные соревнования", interregional:"Межрегиональные соревнования", allrussian:"Всероссийские соревнования" };
+
 compSelectBtn.addEventListener('click', ()=>{
   const list = COMPETITIONS[state.target];
   const optsList = document.getElementById('compOptionsList');
-  optsList.innerHTML = list.map(c=>{
+  let html = '';
+  let lastGroup = null;
+  list.forEach(c=>{
+    if(c.group !== lastGroup){
+      html += `<div class="group-sep">— ${GROUP_LABELS[c.group]} —</div>`;
+      lastGroup = c.group;
+    }
     const active = c.id === state.comp ? ' active' : '';
-    return `<button class="opt-btn${active}" data-comp-id="${c.id}">${c.label}</button>`;
-  }).join('');
+    html += `<button class="opt-btn${active}" data-comp-id="${c.id}">${c.label}</button>`;
+  });
+  optsList.innerHTML = html;
   openModal('compModal');
 });
 document.getElementById('compOptionsList').addEventListener('click', (e)=>{
@@ -564,7 +595,7 @@ function icon(name){
   const icons = {
     people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
     map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg>',
-    gavel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 13l6.5 6.5"/><path d="M18.5 2.5l3 3L16 11l-3-3z"/><path d="M2 22l7-7"/><path d="M6 12l6-6 3 3-6 6z"/></svg>',
+    gavel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7 3.2v5.3c0 4.6-3 8.7-7 10.5-4-1.8-7-5.9-7-10.5V5.7z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
     flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22V4"/><path d="M4 4h13l-2 4 2 4H4"/></svg>',
     star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9 12 2"/></svg>',
     percent:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>'
@@ -580,7 +611,7 @@ function formatButtonsHtml(){
     return `<button class="opt-btn${active}${dis}" data-group="format" data-value="${val}">${label}</button>`;
   };
   let html = `<div class="field">
-    <span class="field-label">Формат участия:</span>
+    <span class="field-label">Формат участия</span>
     <div class="btn-row">
       ${btn('personal','Личное')}
       ${btn('team','Командное')}
@@ -595,7 +626,7 @@ function formatButtonsHtml(){
 
 function zachetLabel(){
   if(state.format === 'personal') return state.sex === 'm' ? 'Мужчины' : 'Женщины';
-  return 'Мужчины и женщины';
+  return 'Мужчины+женщины';
 }
 
 function render(){
@@ -677,7 +708,8 @@ function render(){
   }
 
   if(comp.need2ms){
-    html += condQ('star', `На соревновании (не только в твоём зачёте) — не менее <b>2 МС/МСМК</b> в официальном зачёте.`, ()=>openExplain('twoms'));
+    const need2msPct = fmtData.percent ? fmtData.percent[state.sex] : comp.personal.percent[state.sex];
+    html += condQ('star', `Участие в соревновании не менее <b>2 МС/МСМК</b> в официальном зачёте, которые набрали не менее <b>${need2msPct}%</b> от победителя.`, ()=>openExplain('twoms'));
   }
 
   html += cond('gavel', `Судьи: <b>${JUDGES[state.target]}</b>.`);
