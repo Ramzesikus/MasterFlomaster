@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<!-- Настрелял на Мастера? — версия v1 -->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Настрелял на Мастера?</title>
+<style>
+  :root{
+    --bg: #14161a;
+    --panel: #1c1f24;
+    --panel-2: #21252b;
+    --line: #2c3138;
+    --text: #eef0ee;
+    --text-dim: #9aa3ad;
+    --brass: #c9924f;
+    --brass-dim: #7a6142;
+    --ok: #5fb37c;
+    --warn: #e2542c;
+    --radius: 14px;
+    font-size: 16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:560px; margin:0 auto; padding:16px 16px 40px; }
+
+  header{ display:flex; align-items:flex-start; justify-content:space-between; padding: 6px 2px 18px; position:relative; }
+  header::after{
+    content:""; position:absolute; left:2px; bottom:6px; width:34px; height:2px; background:var(--brass);
+  }
+  h1{ font-size:1.4rem; margin:0; letter-spacing:-0.01em; font-weight:700; line-height:1.25; }
+  .head-icons{ display:flex; gap:8px; flex:none; margin-left:12px; }
+  .icon-btn{
+    width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--text-dim); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex:none;
+  }
+  .icon-btn svg{ width:16px; height:16px; }
+  .icon-btn:active{ transform:scale(0.94); }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-bottom:12px;
+  }
+  .card-output{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--brass);
+  }
+
+  .field{ margin-bottom:16px; }
+  .field:last-child{ margin-bottom:0; }
+  .field-label{
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--text-dim); margin-bottom:8px; display:block; font-weight:600;
+  }
+  .field-note{ font-size:0.76rem; color:var(--text-dim); margin-top:6px; }
+
+  .btn-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .opt-btn{
+    appearance:none; border:1px solid var(--line); background:var(--panel-2);
+    color:var(--text); font-size:0.88rem; padding:9px 14px; border-radius:10px;
+    cursor:pointer; transition: all .15s ease; font-family:inherit; line-height:1.2;
+  }
+  .opt-btn:active{ transform: scale(0.97); }
+  .opt-btn.active{
+    background: var(--brass); border-color: var(--brass); color:#191410; font-weight:700;
+  }
+  .opt-btn.disabled{ opacity:0.35; pointer-events:none; }
+
+  select.dd{
+    width:100%; appearance:none; -webkit-appearance:none;
+    background:var(--panel-2) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%239aa3ad" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 14px center;
+    border:1px solid var(--line); color:var(--text); font-size:0.92rem;
+    padding:12px 36px 12px 14px; border-radius:10px; font-family:inherit;
+  }
+  select.dd:focus{ outline:2px solid var(--brass); outline-offset:1px; }
+
+  /* ---- results ---- */
+  #resultZone{ min-height:40px; }
+
+  .r-headline{
+    padding:12px 14px; border-radius:12px; margin-bottom:14px; font-size:0.96rem; line-height:1.4;
+    border:1px solid var(--line);
+  }
+  .r-headline.state-ok{ background:rgba(95,179,124,0.1); border-color:rgba(95,179,124,0.35); }
+  .r-headline.state-na{ background:rgba(226,84,44,0.1); border-color:rgba(226,84,44,0.35); }
+
+  .zachet-line{ font-size:0.82rem; color:var(--text-dim); margin-bottom:10px; }
+  .zachet-line b{ color:var(--text); }
+
+  .req-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px; }
+  .req-grid.single{ grid-template-columns: 1fr; }
+  .req-box{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+  }
+  .req-box .k{ font-size:0.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--text-dim); margin-bottom:6px; }
+  .req-box .v{ font-size:1.3rem; font-weight:700; }
+  .req-box .v .unit{ font-size:0.85rem; color:var(--text-dim); font-weight:500; margin-left:2px;}
+
+  .cond-list{ display:flex; flex-direction:column; gap:8px; }
+  .cond{
+    display:flex; gap:10px; align-items:flex-start; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:12px; padding:11px 13px; font-size:0.87rem; line-height:1.42; color:var(--text);
+  }
+  .cond .ic{ flex:none; width:19px; height:19px; margin-top:1px; color:var(--brass); }
+  .cond .txt{ flex:1; }
+  .cond .txt b{ color:var(--text); }
+  .cond .txt .dim{ color:var(--text-dim); }
+  .q-btn{
+    flex:none; width:19px; height:19px; border-radius:50%; border:1px solid var(--brass-dim);
+    background:transparent; color:var(--brass); font-size:0.68rem; font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:1px;
+    font-family:inherit;
+  }
+  .q-btn:active{ transform:scale(0.9); }
+
+  /* ---- modals ---- */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(6,7,8,0.68);
+    align-items:flex-end; justify-content:center; z-index:100; padding:0;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-card{
+    width:100%; max-width:560px; background:var(--panel); border:1px solid var(--line);
+    border-radius:18px 18px 0 0; padding:20px 20px 26px; position:relative;
+    max-height:78vh; overflow-y:auto;
+  }
+  @media (min-width:600px){
+    .modal-overlay{ align-items:center; }
+    .modal-card{ border-radius:16px; }
+  }
+  .modal-title{ font-size:1.05rem; font-weight:700; margin:0 30px 12px 0; }
+  .modal-body{ font-size:0.88rem; line-height:1.55; color:var(--text-dim); }
+  .modal-body p{ margin:0 0 10px; }
+  .modal-body b{ color:var(--text); }
+  .modal-close{
+    position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
+    border:1px solid var(--line); background:var(--panel-2); color:var(--text-dim);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem;
+  }
+  .modal-body textarea{
+    width:100%; min-height:96px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:10px; color:var(--text); font-family:inherit; font-size:0.9rem; padding:11px 12px;
+    resize:vertical; margin-top:10px;
+  }
+  .modal-body textarea:focus{ outline:2px solid var(--brass); outline-offset:1px; }
+  .modal-btn{
+    margin-top:12px; width:100%; padding:12px; border-radius:10px; border:none;
+    background:var(--brass); color:#191410; font-weight:700; font-size:0.92rem; cursor:pointer;
+  }
+  .modal-btn:active{ transform:scale(0.98); }
+  .modal-status{ font-size:0.82rem; color:var(--text-dim); margin-top:8px; min-height:1.2em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Настрелял на Мастера?</h1>
+    <div class="head-icons">
+      <button class="icon-btn" id="infoBtn" aria-label="О приложении">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="11"/><circle cx="12" cy="7.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button class="icon-btn" id="feedbackBtn" aria-label="Написать разработчику">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5.6A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 1 1 21 11.5z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="field">
+      <span class="field-label">Пол</span>
+      <div class="btn-row" id="sexRow">
+        <button class="opt-btn" data-group="sex" data-value="m">Мужчина</button>
+        <button class="opt-btn" data-group="sex" data-value="f">Женщина</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Текущий разряд / звание</span>
+      <div class="btn-row" id="curRow">
+        <button class="opt-btn" data-group="cur" data-value="0">Ниже 1 разряда</button>
+        <button class="opt-btn" data-group="cur" data-value="1">1 разряд</button>
+        <button class="opt-btn" data-group="cur" data-value="2">КМС</button>
+        <button class="opt-btn" data-group="cur" data-value="3">МС</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Хочу получить</span>
+      <div class="btn-row" id="targetRow">
+        <button class="opt-btn" data-group="target" data-value="r1">1 разряд</button>
+        <button class="opt-btn" data-group="target" data-value="kms">КМС</button>
+        <button class="opt-btn" data-group="target" data-value="ms">МС</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Статус соревнования</span>
+      <select class="dd" id="compSelect"></select>
+    </div>
+  </div>
+
+  <div id="resultZone"></div>
+
+</div>
+
+<!-- ===== INFO MODAL ===== -->
+<div class="modal-overlay" id="infoModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="infoModal">×</button>
+    <h3 class="modal-title">О приложении</h3>
+    <div class="modal-body">
+      <p>Требования и условия для получения 1 разряда, КМС и МС по практической стрельбе — пистолет и револьвер, взрослые мужчины и женщины.</p>
+      <p><b>Источники:</b><br>
+      1) Положение о Единой всероссийской спортивной классификации (утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510; действует с 01.09.2025).<br>
+      2) Приложение №54 к приказу Минспорта России от 09.04.2026 №299 («Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”»).</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v1</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FEEDBACK MODAL ===== -->
+<div class="modal-overlay" id="feedbackModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="feedbackModal">×</button>
+    <h3 class="modal-title">Написать разработчику</h3>
+    <div class="modal-body">
+      <p>Нашёл ошибку в цифрах, не разобрался в интерфейсе — пиши.</p>
+      <textarea id="feedbackText" placeholder="Что не так или что добавить..."></textarea>
+      <button class="modal-btn" id="feedbackSend">Отправить</button>
+      <div class="modal-status" id="feedbackStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EXPLAIN MODAL (динамический) ===== -->
+<div class="modal-overlay" id="explainModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="explainModal">×</button>
+    <h3 class="modal-title" id="explainTitle"></h3>
+    <div class="modal-body" id="explainBody"></div>
+  </div>
+</div>
+
+<script>
+/* ============ ДАННЫЕ ============ */
+
+const RANK_ORDER = { r1:1, kms:2, ms:3 };
+const RANK_LABEL = { below:"ниже 1 разряда", r1:"1 разряд", kms:"КМС", ms:"МС" };
+const CUR_INDEX_TO_KEY = ["below","r1","kms","ms"];
+const PREREQ_LABEL = { r1:null, kms:null, ms:"КМС" };
+
+const JUDGES = {
+  r1:  "2 судьи 1-й категории + 1 судья 2-й категории",
+  kms: "1 судья всероссийской категории + 2 судьи 1-й категории",
+  ms:  "3 судьи всероссийской категории"
+};
+
+const REGIONS_ALLRU = {
+  short: "23 и больше — целиком, 6–22 включительно — половинка",
+  explain: "<p>«Половинка» — это не полный зачёт условия, а половина нормы. Чтобы получить разряд/звание при половинке, норму нужно выполнить <b>дважды в течение 3 лет</b>, на разных соревнованиях, и каждый раз — при участии от 6 до 22 регионов включительно.</p><p>Считаются регионы, представленные именно в официальном зачёте — остальные участники соревнования не в счёт.</p>"
+};
+const REGIONS_FO = {
+  short: "не менее 50% регионов округа",
+  explain: "<p>Считаются регионы, представленные именно в официальном зачёте, а не всё соревнование целиком. Точное число зависит от округа — где-то это 5–6 регионов, где-то больше.</p>"
+};
+
+const COND_RESIDENCY = {
+  short: "Нужно быть приписанным к региону, где проходит соревнование.",
+  title: "Приписка к региону",
+  explain: "<p>На региональных соревнованиях в официальный зачёт входят только спортсмены, приписанные к этому региону.</p><p>Например, стрелок из Воронежской области может физически выступить на чемпионате Москвы, но не в официальном зачёте москвичей — результат не попадёт в официальный протокол, и разряд по нему не присвоят.</p>"
+};
+const COND_APPLICATION = {
+  short: "Нужно быть включённым в региональную заявку (её готовит региональное отделение федерации).",
+  title: "Региональная заявка",
+  explain: "<p>Участвовать в соревновании можно и без региональной заявки. Но в официальный зачёт (и, соответственно, на разряд) попадают только те, кто в неё включён. Заявку подаёт региональное отделение федерации, до старта.</p>"
+};
+
+// tier: 'residency' (региональный уровень — приписка) | 'application' (межрегиональный+ — заявка)
+const COMPETITIONS = {
+  r1: [
+    { id:"subject_champ", label:"Чемпионат субъекта РФ", tier:"residency", minParticipants:4,
+      personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
+    { id:"subject_cup", label:"Финал Кубка субъекта (кроме Москвы и Санкт-Петербурга)", tier:"residency", minParticipants:4,
+      personal:{ place:null, percent:{m:75, f:65} }, team:null, duel:null, regions:null, need2ms:false },
+    { id:"subject_other", label:"Другие соревнования субъекта РФ", blocked:true,
+      blockedMessage:"Недавние изменения ЕВСК убрали возможность получить 1 разряд на этом статусе — для взрослых в пистолете/револьвере норма здесь больше не предусмотрена." },
+    { id:"msk_spb_champ", label:"Чемпионат Москвы / Санкт-Петербурга", tier:"residency", minParticipants:4,
+      personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
+    { id:"fo_champ", label:"Чемпионат федерального округа", tier:"application", minParticipants:4,
+      personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
+    { id:"interregional_other", label:"Другие межрегиональные соревнования", tier:"application", minParticipants:4,
+      personal:{ place:null, percent:{m:75, f:65} }, team:null, duel:null, regions:null, need2ms:false },
+  ],
+  kms: [
+    { id:"msk_spb_champ", label:"Чемпионат Москвы / Санкт-Петербурга", tier:"residency", minParticipants:6,
+      personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:85, f:75} }, team:{place:"1–2"}, duel:{place:"1–2"},
+      regions:null, need2ms:true },
+    { id:"fo_champ", label:"Чемпионат федерального округа", tier:"application", minParticipants:6,
+      personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:85, f:75} }, team:{place:"1–2"}, duel:{place:"1–2"},
+      regions:REGIONS_FO, need2ms:true },
+    { id:"russia_champ", label:"Чемпионат России (ЧР)", tier:"application", minParticipants:6,
+      personal:{ place:{m:"1–11", f:"1–8"}, percent:{m:75, f:65} }, team:{place:"1–2"}, duel:{place:"1–2"},
+      regions:REGIONS_ALLRU, need2ms:true },
+    { id:"russia_cup", label:"Финал Кубка России (ФКР)", tier:"application", minParticipants:6,
+      personal:{ place:{m:"1–8", f:"1–6"}, percent:{m:75, f:65} }, team:{place:"1–2"}, duel:{place:"1–2"},
+      regions:REGIONS_ALLRU, need2ms:true },
+    { id:"allru_other", label:"Всероссийское соревнование (кроме ЧР и ФКР)", tier:"application", minParticipants:6,
+      personal:{ place:{m:"1–5", f:"1–4"}, percent:{m:80, f:70} }, team:{place:"1–2"}, duel:{place:"1–2"},
+      regions:REGIONS_ALLRU, need2ms:true },
+  ],
+  ms: [
+    { id:"russia_champ", label:"Чемпионат России (ЧР)", tier:"application", minParticipants:6,
+      personal:{ place:{m:"1–6", f:"1–4"}, percent:{m:85, f:75} }, team:{place:"1"}, duel:{place:"1"},
+      regions:REGIONS_ALLRU, need2ms:true },
+    { id:"russia_cup", label:"Финал Кубка России (ФКР)", tier:"application", minParticipants:6,
+      personal:{ place:{m:"1–5", f:"1–3"}, percent:{m:85, f:75} }, team:{place:"1"}, duel:{place:"1"},
+      regions:REGIONS_ALLRU, need2ms:true },
+    { id:"allru_other", label:"Всероссийское соревнование (кроме ЧР и ФКР)", tier:"application", minParticipants:6,
+      personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:90, f:80} }, team:{place:"1"}, duel:{place:"1"},
+      regions:REGIONS_ALLRU, need2ms:true },
+  ]
+};
+
+const EXPLAIN = {
+  zachet: {
+    title: "Что такое «зачёт»",
+    body: "<p><b>Зачёт</b> — конкретная комбинация класса, пола и формата (личный/командный/дуэльный), за которую отдельно распределяются места. Например, PRD «Мужчины» и PRD «Женщины» — разные зачёты, даже на одном соревновании.</p><p>Зачёты бывают официальными и неофициальными. Официальный — тот, что прямо указан в положении о соревновании и по которому присваиваются разряды и звания. Неофициальный — это не только дополнительное распределение мест (например, по возрасту), но и результаты спортсменов, которые вообще не входят в официальный зачёт. Например, стрелок из Воронежской области, выступающий на чемпионате Москвы, физически стреляет, но идёт вне официального зачёта москвичей — в официальный протокол не попадает, и разряд по этому старту не получает.</p><p>Условие по числу участников/команд считается именно внутри официального зачёта.</p>"
+  },
+  regions: { title: "Условие по регионам", body: "" }, // заполняется динамически
+  twoms: {
+    title: "Условие «2 МС на соревновании»",
+    body: "<p>Речь про <b>всё соревнование целиком</b>, а не только про твой зачёт — эти два МС (или МСМК) могут выступать в любом зачёте того же старта, но обязательно в официальном.</p><p>И процент от победителя они должны набрать в своём личном зачёте — тот же процент, что требуется для присвоения на этом статусе соревнования.</p>"
+  },
+  crosspercent: {
+    title: "Почему нужен ещё и личный процент",
+    body: "<p>В командных и дуэльных зачётах места распределяются только по занятому месту, без учёта процента. Но ЕВСК отдельно требует, чтобы в этом же соревновании у спортсмена был личный результат — тот же процент от победителя, что нужен для его личного разряда/звания на этом статусе.</p><p>Без личного процента место в команде/дуэли разряд не даёт.</p>"
+  },
+  cond_residency: { title: COND_RESIDENCY.title, body: COND_RESIDENCY.explain },
+  cond_application: { title: COND_APPLICATION.title, body: COND_APPLICATION.explain }
+};
+
+/* ============ TELEGRAM ============ */
+let tg = null;
+try{
+  tg = window.Telegram && window.Telegram.WebApp;
+  if(tg){ tg.ready(); tg.expand(); }
+}catch(e){}
+
+/* ============ АНАЛИТИКА / ОБРАТНАЯ СВЯЗЬ (через Telegram Bot API, без сервера) ============
+   Прямой fetch на api.telegram.org с токеном бота — так же, как раньше.
+   ВАЖНО: токен виден в исходнике страницы — ок для личного проекта с закрытой
+   аудиторией, но для широкого распространения стоит спрятать за прокси-сервером.
+   Вставь свои значения ниже. Логируется только факт захода (кто и когда —
+   время видно прямо в чате бота), без лога того, что человек выбирает. */
+const ANALYTICS_BOT_TOKEN = "8976902599:AAFpFT77uvYgh7niWvcq1xWkx5AYYynkEkw";
+const ANALYTICS_CHAT_ID = "-5443571059";
+const APP_VERSION = "v1";
+
+function getDeviceLabel(){
+  const ua = navigator.userAgent || "";
+  if(/iPhone|Android.*Mobile|Windows Phone/i.test(ua)) return "смартфон";
+  if(/iPad|Android(?!.*Mobile)|Tablet/i.test(ua)) return "планшет";
+  return "компьютер";
+}
+
+function getUserLabel(){
+  try{
+    const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+    if(u){
+      return (u.first_name || "") + (u.last_name ? " " + u.last_name : "") +
+        (u.username ? " (@" + u.username + ")" : "") + " [id" + u.id + "]";
+    }
+  }catch(e){}
+  return "не через Telegram";
+}
+
+function sendAnalytics(text){
+  try{
+    fetch("https://api.telegram.org/bot" + ANALYTICS_BOT_TOKEN + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: ANALYTICS_CHAT_ID, text: text }),
+      keepalive: true
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+sendAnalytics("🎯 Зашёл: " + getUserLabel() + " | " + getDeviceLabel() + " | " + APP_VERSION);
+
+/* ============ MODALS ============ */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('[data-close]').forEach(b=>{
+  b.addEventListener('click', ()=>closeModal(b.dataset.close));
+});
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click', (e)=>{ if(e.target === ov) closeModal(ov.id); });
+});
+
+document.getElementById('infoBtn').addEventListener('click', ()=>openModal('infoModal'));
+document.getElementById('feedbackBtn').addEventListener('click', ()=>openModal('feedbackModal'));
+
+document.getElementById('feedbackSend').addEventListener('click', ()=>{
+  const text = document.getElementById('feedbackText').value.trim();
+  const statusEl = document.getElementById('feedbackStatus');
+  if(!text){ statusEl.textContent = 'Сначала напиши что-нибудь.'; return; }
+  const stateLine = `пол:${state.sex} тек:${state.cur} цель:${state.target} формат:${state.format} статус:${state.comp}`;
+  sendAnalytics("✉️ Фидбэк от " + getUserLabel() + ":\n" + text + "\n\n(" + stateLine + " | " + APP_VERSION + ")");
+  statusEl.textContent = 'Отправлено, спасибо.';
+  document.getElementById('feedbackText').value = '';
+});
+
+function openExplain(key, dynamicBody, dynamicTitle){
+  const e = EXPLAIN[key];
+  document.getElementById('explainTitle').textContent = dynamicTitle || e.title;
+  document.getElementById('explainBody').innerHTML = dynamicBody || e.body;
+  openModal('explainModal');
+}
+
+/* ============ STATE ============ */
+const state = { sex:"m", cur:"0", target:"r1", format:"personal", comp:null };
+let explainRegistry = [];
+
+function setActive(group, value){
+  document.querySelectorAll('.opt-btn[data-group="'+group+'"]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.value === value);
+  });
+}
+
+function wireButtons(group, onSet){
+  document.querySelectorAll('.opt-btn[data-group="'+group+'"]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(b.classList.contains('disabled')) return;
+      onSet(b.dataset.value);
+      setActive(group, b.dataset.value);
+      render();
+    });
+  });
+}
+
+wireButtons('sex', v=>{ state.sex=v; });
+wireButtons('cur', v=>{ state.cur=v; });
+wireButtons('target', v=>{
+  state.target=v;
+  if(state.target === 'r1') state.format = 'personal';
+  populateCompetitions();
+});
+
+setActive('sex', state.sex);
+setActive('cur', state.cur);
+setActive('target', state.target);
+
+const compSelect = document.getElementById('compSelect');
+compSelect.addEventListener('change', ()=>{ state.comp = compSelect.value; render(); });
+
+function populateCompetitions(){
+  const list = COMPETITIONS[state.target];
+  compSelect.innerHTML = list.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
+  state.comp = list[0].id;
+  compSelect.value = state.comp;
+  render();
+}
+populateCompetitions();
+
+// клики по кнопкам формата — живут внутри #resultZone, навешиваем через делегирование
+document.getElementById('resultZone').addEventListener('click', (e)=>{
+  const fBtn = e.target.closest('.opt-btn[data-group="format"]');
+  if(fBtn && !fBtn.classList.contains('disabled')){
+    state.format = fBtn.dataset.value;
+    render();
+    return;
+  }
+});
+
+/* ============ RENDER ============ */
+
+function icon(name){
+  const icons = {
+    people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg>',
+    gavel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 13l6.5 6.5"/><path d="M18.5 2.5l3 3L16 11l-3-3z"/><path d="M2 22l7-7"/><path d="M6 12l6-6 3 3-6 6z"/></svg>',
+    flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22V4"/><path d="M4 4h13l-2 4 2 4H4"/></svg>',
+    star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9 12 2"/></svg>',
+    percent:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>'
+  };
+  return icons[name] || '';
+}
+
+function formatButtonsHtml(){
+  const disabled = state.target === 'r1';
+  const btn = (val, label) => {
+    const active = state.format === val ? ' active' : '';
+    const dis = (disabled && val !== 'personal') ? ' disabled' : '';
+    return `<button class="opt-btn${active}${dis}" data-group="format" data-value="${val}">${label}</button>`;
+  };
+  let html = `<div class="field">
+    <span class="field-label">Формат участия</span>
+    <div class="btn-row">
+      ${btn('personal','Личное')}
+      ${btn('team','Командное')}
+      ${btn('duel','Дуэльное')}
+    </div>`;
+  if(disabled){
+    html += `<div class="field-note">1 разряд можно получить только в личном зачёте.</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function zachetLabel(){
+  if(state.format === 'personal') return state.sex === 'm' ? 'Мужчины' : 'Женщины';
+  return 'Мужчины и женщины';
+}
+
+function render(){
+  const zone = document.getElementById('resultZone');
+  const curIdx = parseInt(state.cur, 10);
+  const targetIdx = RANK_ORDER[state.target];
+  const curKey = CUR_INDEX_TO_KEY[curIdx];
+
+  if(curIdx >= targetIdx){
+    zone.innerHTML = `
+      <div class="card card-output">
+        <div class="r-headline state-ok">У тебя уже есть <b>${RANK_LABEL[curKey]}</b>.</div>
+      </div>`;
+    return;
+  }
+
+  const prereq = PREREQ_LABEL[state.target];
+  if(prereq && curIdx < targetIdx - 1){
+    zone.innerHTML = `
+      <div class="card card-output">
+        <div class="r-headline state-na">Пока не получится: для <b>${RANK_LABEL[state.target]}</b> сначала нужен <b>${prereq}</b>.</div>
+      </div>`;
+    return;
+  }
+
+  const list = COMPETITIONS[state.target];
+  const comp = list.find(c=>c.id === state.comp) || list[0];
+
+  if(comp.blocked){
+    zone.innerHTML = `
+      <div class="card card-output">
+        <div class="r-headline state-na">${comp.blockedMessage}</div>
+      </div>`;
+    return;
+  }
+
+  const fmtData = comp[state.format];
+
+  let html = `<div class="card card-output">`;
+
+  html += formatButtonsHtml();
+
+  html += `<div class="zachet-line">Зачёт: <b>${zachetLabel()}</b></div>`;
+
+  if(state.format === 'personal'){
+    const pct = fmtData.percent[state.sex];
+    const place = fmtData.place ? fmtData.place[state.sex] : null;
+    html += `<div class="req-grid">`;
+    html += `<div class="req-box"><div class="k">Процент от победителя</div><div class="v">${pct}<span class="unit">% и выше</span></div></div>`;
+    if(place){
+      html += `<div class="req-box"><div class="k">Место</div><div class="v">${place}</div></div>`;
+    } else {
+      html += `<div class="req-box"><div class="k">Место</div><div class="v" style="font-size:1rem;">не требуется</div></div>`;
+    }
+    html += `</div>`;
+  } else {
+    html += `<div class="req-grid single">`;
+    html += `<div class="req-box"><div class="k">Место</div><div class="v">${fmtData.place}</div></div>`;
+    html += `</div>`;
+  }
+
+  html += `<div class="cond-list">`;
+
+  if(state.format !== 'personal'){
+    const personalPct = comp.personal.percent[state.sex];
+    html += condQ('percent', `Дополнительно нужен личный результат: <b>${personalPct}% и выше</b> от победителя в личном зачёте на этом же соревновании.`, ()=>openExplain('crosspercent'));
+  }
+
+  if(comp.minParticipants){
+    const unit = state.format === 'team' ? 'команд' : 'участников';
+    html += condQ('people', `Не менее <b>${comp.minParticipants} ${unit}</b> в зачёте.`, ()=>openExplain('zachet'));
+  }
+
+  if(comp.regions){
+    html += condQ('map', `Регионы в официальном зачёте: <b>${comp.regions.short}</b>.`, ()=>openExplain('regions', comp.regions.explain));
+  }
+
+  if(comp.need2ms){
+    html += condQ('star', `На соревновании (не только в твоём зачёте) — не менее <b>2 МС/МСМК</b> в официальном зачёте.`, ()=>openExplain('twoms'));
+  }
+
+  html += cond('gavel', `Судьи: <b>${JUDGES[state.target]}</b>.`);
+
+  if(comp.tier === 'residency'){
+    html += condQ('flag', COND_RESIDENCY.short, ()=>openExplain('cond_residency'));
+  } else if(comp.tier === 'application'){
+    html += condQ('flag', COND_APPLICATION.short, ()=>openExplain('cond_application'));
+  }
+
+  html += `</div></div>`;
+
+  zone.innerHTML = html;
+}
+
+function cond(ic, text){
+  return `<div class="cond"><span class="ic">${icon(ic)}</span><span class="txt">${text}</span></div>`;
+}
+
+function condQ(ic, text, onOpen){
+  const idx = explainRegistry.length;
+  explainRegistry.push(onOpen);
+  return `<div class="cond"><span class="ic">${icon(ic)}</span><span class="txt">${text}</span><button class="q-btn" data-registry-idx="${idx}">?</button></div>`;
+}
+
+document.getElementById('resultZone').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.q-btn');
+  if(!btn) return;
+  const idx = btn.dataset.registryIdx;
+  if(idx !== undefined && explainRegistry[idx]){
+    explainRegistry[idx]();
+  }
+});
+
+render = (function(origRender){
+  return function(){
+    explainRegistry = [];
+    origRender();
+  };
+})(render);
+
+render();
+</script>
+</body>
+</html>
