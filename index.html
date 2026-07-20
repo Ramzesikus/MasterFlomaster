@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v1 -->
+<!-- Настрелял на Мастера? — версия v3 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Настрелял на Мастера?</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root{
     --bg: #14161a;
@@ -77,13 +78,21 @@
   }
   .opt-btn.disabled{ opacity:0.35; pointer-events:none; }
 
-  select.dd{
-    width:100%; appearance:none; -webkit-appearance:none;
+  select.dd, .dd-btn{
+    width:100%; appearance:none; -webkit-appearance:none; text-align:left;
     background:var(--panel-2) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%239aa3ad" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 14px center;
     border:1px solid var(--line); color:var(--text); font-size:0.92rem;
     padding:12px 36px 12px 14px; border-radius:10px; font-family:inherit;
   }
-  select.dd:focus{ outline:2px solid var(--brass); outline-offset:1px; }
+  select.dd:focus, .dd-btn:focus{ outline:2px solid var(--brass); outline-offset:1px; }
+  .dd-btn{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; line-height:1.3; }
+  .dd-btn svg{ display:none; } /* стрелка уже нарисована фоном, эта — про запас, скрыта */
+  #compOptionsList .opt-btn{ width:100%; text-align:left; }
+
+  .result-eyebrow{
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;
+    color:var(--brass); margin:6px 2px 8px; display:block;
+  }
 
   /* ---- results ---- */
   #resultZone{ min-height:40px; }
@@ -207,7 +216,10 @@
 
     <div class="field">
       <span class="field-label">Статус соревнования</span>
-      <select class="dd" id="compSelect"></select>
+      <button class="opt-btn dd-btn" id="compSelectBtn" type="button">
+        <span id="compSelectLabel"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
     </div>
   </div>
 
@@ -221,11 +233,11 @@
     <button class="modal-close" data-close="infoModal">×</button>
     <h3 class="modal-title">О приложении</h3>
     <div class="modal-body">
-      <p>Требования и условия для получения 1 разряда, КМС и МС по практической стрельбе — пистолет и револьвер, взрослые мужчины и женщины.</p>
+      <p>Требования, нормы и условия для получения 1 разряда, КМС и МС по практической стрельбе — пистолет и револьвер, взрослые мужчины и женщины.</p>
       <p><b>Источники:</b><br>
       1) Положение о Единой всероссийской спортивной классификации (утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510; действует с 01.09.2025).<br>
-      2) Приложение №54 к приказу Минспорта России от 09.04.2026 №299 («Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”»).</p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v1</p>
+      2) Приложение №54 к приказу Минспорта России от 09.04.2026 №299 («Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”»; действует с 19.06.2026).</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v3</p>
     </div>
   </div>
 </div>
@@ -240,6 +252,17 @@
       <textarea id="feedbackText" placeholder="Что не так или что добавить..."></textarea>
       <button class="modal-btn" id="feedbackSend">Отправить</button>
       <div class="modal-status" id="feedbackStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMPETITION PICKER MODAL ===== -->
+<div class="modal-overlay" id="compModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="compModal">×</button>
+    <h3 class="modal-title">Статус соревнования</h3>
+    <div class="modal-body">
+      <div class="btn-row" id="compOptionsList" style="flex-direction:column;"></div>
     </div>
   </div>
 </div>
@@ -277,9 +300,9 @@ const REGIONS_FO = {
 };
 
 const COND_RESIDENCY = {
-  short: "Нужно быть приписанным к региону, где проходит соревнование.",
+  short: "Нужно быть приписанным к региону-организатору соревнования.",
   title: "Приписка к региону",
-  explain: "<p>На региональных соревнованиях в официальный зачёт входят только спортсмены, приписанные к этому региону.</p><p>Например, стрелок из Воронежской области может физически выступить на чемпионате Москвы, но не в официальном зачёте москвичей — результат не попадёт в официальный протокол, и разряд по нему не присвоят.</p>"
+  explain: "<p>На региональных соревнованиях в официальный зачёт входят только спортсмены, приписанные к региону-организатору — тому, чьё это соревнование, а не к региону, где физически расположена площадка (стрелковый комплекс в одном регионе нередко принимает соревнования соседнего).</p><p>Например, стрелок из Воронежской области может физически выступить на чемпионате Москвы, но не в официальном зачёте москвичей — результат не попадёт в официальный протокол, и разряд по нему не присвоят.</p>"
 };
 const COND_APPLICATION = {
   short: "Нужно быть включённым в региональную заявку (её готовит региональное отделение федерации).",
@@ -366,9 +389,19 @@ try{
    время видно прямо в чате бота), без лога того, что человек выбирает. */
 const ANALYTICS_BOT_TOKEN = "8976902599:AAFpFT77uvYgh7niWvcq1xWkx5AYYynkEkw";
 const ANALYTICS_CHAT_ID = "-5443571059";
-const APP_VERSION = "v1";
+const APP_VERSION = "v3";
 
 function getDeviceLabel(){
+  try{
+    if(tg && tg.platform && tg.platform !== 'unknown'){
+      const p = tg.platform;
+      if(p === 'ios' || p === 'android') return "смартфон (" + p + ")";
+      if(p === 'android_x' || p === 'ios_x') return "планшет (" + p + ")";
+      if(p === 'tdesktop' || p === 'macos') return "компьютер (" + p + ")";
+      if(p === 'web' || p === 'weba') return "браузер (" + p + ")";
+      return p;
+    }
+  }catch(e){}
   const ua = navigator.userAgent || "";
   if(/iPhone|Android.*Mobile|Windows Phone/i.test(ua)) return "смартфон";
   if(/iPad|Android(?!.*Mobile)|Tablet/i.test(ua)) return "планшет";
@@ -462,14 +495,30 @@ setActive('sex', state.sex);
 setActive('cur', state.cur);
 setActive('target', state.target);
 
-const compSelect = document.getElementById('compSelect');
-compSelect.addEventListener('change', ()=>{ state.comp = compSelect.value; render(); });
+const compSelectBtn = document.getElementById('compSelectBtn');
+const compSelectLabel = document.getElementById('compSelectLabel');
+compSelectBtn.addEventListener('click', ()=>{
+  const list = COMPETITIONS[state.target];
+  const optsList = document.getElementById('compOptionsList');
+  optsList.innerHTML = list.map(c=>{
+    const active = c.id === state.comp ? ' active' : '';
+    return `<button class="opt-btn${active}" data-comp-id="${c.id}">${c.label}</button>`;
+  }).join('');
+  openModal('compModal');
+});
+document.getElementById('compOptionsList').addEventListener('click', (e)=>{
+  const b = e.target.closest('.opt-btn[data-comp-id]');
+  if(!b) return;
+  state.comp = b.dataset.compId;
+  compSelectLabel.textContent = b.textContent;
+  closeModal('compModal');
+  render();
+});
 
 function populateCompetitions(){
   const list = COMPETITIONS[state.target];
-  compSelect.innerHTML = list.map(c=>`<option value="${c.id}">${c.label}</option>`).join('');
   state.comp = list[0].id;
-  compSelect.value = state.comp;
+  compSelectLabel.textContent = list[0].label;
   render();
 }
 populateCompetitions();
@@ -532,6 +581,7 @@ function render(){
 
   if(curIdx >= targetIdx){
     zone.innerHTML = `
+      <span class="result-eyebrow">Что нужно</span>
       <div class="card card-output">
         <div class="r-headline state-ok">У тебя уже есть <b>${RANK_LABEL[curKey]}</b>.</div>
       </div>`;
@@ -541,6 +591,7 @@ function render(){
   const prereq = PREREQ_LABEL[state.target];
   if(prereq && curIdx < targetIdx - 1){
     zone.innerHTML = `
+      <span class="result-eyebrow">Что нужно</span>
       <div class="card card-output">
         <div class="r-headline state-na">Пока не получится: для <b>${RANK_LABEL[state.target]}</b> сначала нужен <b>${prereq}</b>.</div>
       </div>`;
@@ -552,6 +603,7 @@ function render(){
 
   if(comp.blocked){
     zone.innerHTML = `
+      <span class="result-eyebrow">Что нужно</span>
       <div class="card card-output">
         <div class="r-headline state-na">${comp.blockedMessage}</div>
       </div>`;
@@ -560,7 +612,7 @@ function render(){
 
   const fmtData = comp[state.format];
 
-  let html = `<div class="card card-output">`;
+  let html = `<span class="result-eyebrow">Что нужно</span><div class="card card-output">`;
 
   html += formatButtonsHtml();
 
