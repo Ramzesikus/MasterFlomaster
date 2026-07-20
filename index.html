@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v4 -->
+<!-- Настрелял на Мастера? — версия v5 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Настрелял на Мастера?</title>
+
+<!-- Open Graph — превью для WhatsApp и других мессенджеров -->
+<meta property="og:title" content="Настрелял на Мастера?">
+<meta property="og:description" content="Требования, нормы и условия для получения 1 разряда, КМС и МС по практической стрельбе (пистолет/револьвер, взрослые мужчины и женщины)">
+<meta property="og:image" content="https://ramzesikus.github.io/MasterFlomaster/logo_640x360.png">
+<meta property="og:url" content="https://t.me/Maaster_floomaster_bot/master">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Настрелял на Мастера?">
+<meta name="twitter:description" content="Требования, нормы и условия для получения 1 разряда, КМС и МС по практической стрельбе (пистолет/револьвер, взрослые мужчины и женщины)">
+<meta name="twitter:image" content="https://ramzesikus.github.io/MasterFlomaster/logo_640x360.png">
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  // Если страницу открыли НЕ изнутри Telegram (например, встроенный браузер
+  // WhatsApp) — сразу перекидываем на t.me-ссылку, которая откроет мини-эпп
+  // штатно. Внутри самого Telegram initData всегда непустая, редирект не сработает.
+  (function(){
+    try{
+      var tgInit = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData;
+      if(!tgInit){
+        window.location.replace("https://t.me/Maaster_floomaster_bot/master");
+      }
+    }catch(e){}
+  })();
+</script>
 <style>
   :root{
     --bg: #14161a;
@@ -238,7 +263,7 @@
       <p><b>Источники:</b><br>
       1) Положение о Единой всероссийской спортивной классификации (утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510; действует с 01.09.2025).<br>
       2) Приложение №54 к приказу Минспорта России от 09.04.2026 №299 («Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”»; действует с 19.06.2026).</p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v4</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v5</p>
     </div>
   </div>
 </div>
@@ -390,7 +415,7 @@ try{
    время видно прямо в чате бота), без лога того, что человек выбирает. */
 const ANALYTICS_BOT_TOKEN = "8976902599:AAFpFT77uvYgh7niWvcq1xWkx5AYYynkEkw";
 const ANALYTICS_CHAT_ID = "-5443571059";
-const APP_VERSION = "v4";
+const APP_VERSION = "v5";
 
 function getDeviceLabel(){
   try{
