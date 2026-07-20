@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v3 -->
+<!-- Настрелял на Мастера? — версия v4 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -62,7 +62,7 @@
   .field:last-child{ margin-bottom:0; }
   .field-label{
     font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em;
-    color:var(--text-dim); margin-bottom:8px; display:block; font-weight:600;
+    color:#c3cad3; margin-bottom:8px; display:block; font-weight:700;
   }
   .field-note{ font-size:0.76rem; color:var(--text-dim); margin-top:6px; }
 
@@ -186,9 +186,10 @@
     </div>
   </header>
 
+  <span class="result-eyebrow" style="color:var(--brass);">Кто я и что хочу?</span>
   <div class="card">
     <div class="field">
-      <span class="field-label">Пол</span>
+      <span class="field-label">Пол:</span>
       <div class="btn-row" id="sexRow">
         <button class="opt-btn" data-group="sex" data-value="m">Мужчина</button>
         <button class="opt-btn" data-group="sex" data-value="f">Женщина</button>
@@ -196,9 +197,9 @@
     </div>
 
     <div class="field">
-      <span class="field-label">Текущий разряд / звание</span>
+      <span class="field-label">Текущий разряд / звание:</span>
       <div class="btn-row" id="curRow">
-        <button class="opt-btn" data-group="cur" data-value="0">Ниже 1 разряда</button>
+        <button class="opt-btn" data-group="cur" data-value="0">&lt;1 разряда</button>
         <button class="opt-btn" data-group="cur" data-value="1">1 разряд</button>
         <button class="opt-btn" data-group="cur" data-value="2">КМС</button>
         <button class="opt-btn" data-group="cur" data-value="3">МС</button>
@@ -206,7 +207,7 @@
     </div>
 
     <div class="field">
-      <span class="field-label">Хочу получить</span>
+      <span class="field-label">Хочу получить:</span>
       <div class="btn-row" id="targetRow">
         <button class="opt-btn" data-group="target" data-value="r1">1 разряд</button>
         <button class="opt-btn" data-group="target" data-value="kms">КМС</button>
@@ -215,7 +216,7 @@
     </div>
 
     <div class="field">
-      <span class="field-label">Статус соревнования</span>
+      <span class="field-label">На соревновании:</span>
       <button class="opt-btn dd-btn" id="compSelectBtn" type="button">
         <span id="compSelectLabel"></span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
@@ -237,7 +238,7 @@
       <p><b>Источники:</b><br>
       1) Положение о Единой всероссийской спортивной классификации (утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510; действует с 01.09.2025).<br>
       2) Приложение №54 к приказу Минспорта России от 09.04.2026 №299 («Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”»; действует с 19.06.2026).</p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v3</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v4</p>
     </div>
   </div>
 </div>
@@ -389,7 +390,7 @@ try{
    время видно прямо в чате бота), без лога того, что человек выбирает. */
 const ANALYTICS_BOT_TOKEN = "8976902599:AAFpFT77uvYgh7niWvcq1xWkx5AYYynkEkw";
 const ANALYTICS_CHAT_ID = "-5443571059";
-const APP_VERSION = "v3";
+const APP_VERSION = "v4";
 
 function getDeviceLabel(){
   try{
@@ -449,8 +450,7 @@ document.getElementById('feedbackSend').addEventListener('click', ()=>{
   const text = document.getElementById('feedbackText').value.trim();
   const statusEl = document.getElementById('feedbackStatus');
   if(!text){ statusEl.textContent = 'Сначала напиши что-нибудь.'; return; }
-  const stateLine = `пол:${state.sex} тек:${state.cur} цель:${state.target} формат:${state.format} статус:${state.comp}`;
-  sendAnalytics("✉️ Фидбэк от " + getUserLabel() + ":\n" + text + "\n\n(" + stateLine + " | " + APP_VERSION + ")");
+  sendAnalytics("✉️ Фидбэк от " + getUserLabel() + ":\n" + text + "\n\n(" + APP_VERSION + ")");
   statusEl.textContent = 'Отправлено, спасибо.';
   document.getElementById('feedbackText').value = '';
 });
@@ -555,7 +555,7 @@ function formatButtonsHtml(){
     return `<button class="opt-btn${active}${dis}" data-group="format" data-value="${val}">${label}</button>`;
   };
   let html = `<div class="field">
-    <span class="field-label">Формат участия</span>
+    <span class="field-label">Формат участия:</span>
     <div class="btn-row">
       ${btn('personal','Личное')}
       ${btn('team','Командное')}
@@ -581,7 +581,7 @@ function render(){
 
   if(curIdx >= targetIdx){
     zone.innerHTML = `
-      <span class="result-eyebrow">Что нужно</span>
+      <span class="result-eyebrow">Что для этого нужно?</span>
       <div class="card card-output">
         <div class="r-headline state-ok">У тебя уже есть <b>${RANK_LABEL[curKey]}</b>.</div>
       </div>`;
@@ -591,7 +591,7 @@ function render(){
   const prereq = PREREQ_LABEL[state.target];
   if(prereq && curIdx < targetIdx - 1){
     zone.innerHTML = `
-      <span class="result-eyebrow">Что нужно</span>
+      <span class="result-eyebrow">Что для этого нужно?</span>
       <div class="card card-output">
         <div class="r-headline state-na">Пока не получится: для <b>${RANK_LABEL[state.target]}</b> сначала нужен <b>${prereq}</b>.</div>
       </div>`;
@@ -603,7 +603,7 @@ function render(){
 
   if(comp.blocked){
     zone.innerHTML = `
-      <span class="result-eyebrow">Что нужно</span>
+      <span class="result-eyebrow">Что для этого нужно?</span>
       <div class="card card-output">
         <div class="r-headline state-na">${comp.blockedMessage}</div>
       </div>`;
@@ -612,7 +612,7 @@ function render(){
 
   const fmtData = comp[state.format];
 
-  let html = `<span class="result-eyebrow">Что нужно</span><div class="card card-output">`;
+  let html = `<span class="result-eyebrow">Что для этого нужно?</span><div class="card card-output">`;
 
   html += formatButtonsHtml();
 
