@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v26 -->
+<!-- Настрелял на Мастера? — версия v28 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -59,11 +59,11 @@
   .age-slider-wrap{ text-align:center; }
   .field-row-2col{ display:flex; gap:12px; margin-bottom:16px; }
   .field-row-2col > .field{ flex:1; min-width:0; }
-  .field-row-2col #sexRow{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
-  .field-row-2col #sexRow .opt-btn{ width:auto; padding-left:16px; padding-right:16px; }
-  .age-value{ font-size:1.3rem; font-weight:700; color:var(--brass); margin-bottom:6px; white-space:nowrap; }
+  .field-row-2col #sexRow{ display:flex; flex-direction:column; align-items:stretch; gap:8px; }
+  .field-row-2col #sexRow .opt-btn{ width:80%; }
+  .age-value{ font-size:1.3rem; font-weight:700; color:var(--brass); margin-bottom:6px; margin-top:10px; white-space:nowrap; }
   .age-value .unit{ font-size:0.95rem; color:var(--text-dim); font-weight:500; margin-left:4px; }
-  input[type=range]{ width:100%; -webkit-appearance:none; height:6px; border-radius:3px;
+  input[type=range]{ width:80%; -webkit-appearance:none; height:6px; border-radius:3px;
     background:var(--panel-2); outline:none; margin-top:6px; }
   input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
     background:var(--brass); cursor:pointer; border:3px solid #191410; }
@@ -202,10 +202,10 @@
     <div class="modal-body">
       <p>Требования, нормы и условия для получения спортивных разрядов и званий по практической стрельбе — все виды оружия, все возрастные категории.</p>
       <p><b>Нормативная база:</b><br>
-      1) Положение о Единой всероссийской спортивной классификации<br>
+      1) Положение о Единой всероссийской спортивной классификации.<br>
       <i>Утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510.</i><br>
       <i>Действует с 01.09.2025.</i></p>
-      <p>2) «Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”».<br>
+      <p>2) Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”.<br>
       <i>Приложение №54 к приказу Минспорта России от 09.04.2026 №299.</i><br>
       <i>Действует с 19.06.2026.</i></p>
       <p>3) Правила вида спорта «практическая стрельба».<br>
@@ -216,7 +216,7 @@
       <p><i>В приложении вместо диапазона мест, которые необходимо занять на матче, мы указываем «не ниже N места» (формально, это не соответствует нормативной базе).</i></p>
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v26</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v28</p>
     </div>
   </div>
 </div>
@@ -276,7 +276,7 @@
 const WEAPONS = [
   { id:'pistol', label:'Пистолет' },
   { id:'revolver', label:'Револьвер' },
-  { id:'rifle', label:'Ружьё, карабин (в т.ч. КПК) и троеборье' },
+  { id:'rifle', label:'Ружьё, карабин (в т.ч. КПК), троеборье' },
   { id:'pneumatic', label:'Пневматика (пистолет или карабин)' },
 ];
 
@@ -314,7 +314,7 @@ const TARGET_GROUPS = [
 const TARGET_LABEL = {}; TARGET_GROUPS.forEach(g=>g.items.forEach(i=>TARGET_LABEL[i.id]=i.label));
 const PNEUMATIC_BLOCKED_TARGETS = ['ms','msmk'];
 const PREREQ = { ms:'kms', msmk:'ms' };
-const CATEGORY_LABEL = { adult:'Взрослые (Мужчины/женщины)', junior:'Юниоры/юниорки (16-20)', youth:'Юноши/девушки (11-15)' };
+const CATEGORY_LABEL = { adult:'Мужчины/женщины', junior:'Юниоры/юниорки (16-20)', youth:'Юноши/девушки (11-15)' };
 
 /* ============ ВСЁ ОСТАЛЬНОЕ (таблица цифр, тексты пояснений) — приходит с воркера, здесь не хранится ============ */
 let META = null; // GROUP_LABELS, REGIONS, JUDGES, COND_TIER, EXPLAIN — заполняется после fetchMeta()
@@ -328,7 +328,7 @@ try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expa
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
 const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
-const APP_VERSION = "v26";
+const APP_VERSION = "v28";
 
 async function relay(action, extra){
   const resp = await fetch(RELAY_URL, {
@@ -707,7 +707,7 @@ function render(){
 
   const prereq = PREREQ[state.target];
   if(prereq){
-    html += condQ('arrowUp', `Нужно уже иметь: <b>${TARGET_LABEL[prereq]}</b>.`, ()=>openExplain('prereq'));
+    html += `<div style="margin-bottom:8px;">${condQ('arrowUp', `Нужно уже иметь: <b>${TARGET_LABEL[prereq]}</b>.`, ()=>openExplain('prereq'))}</div>`;
   }
 
   if(state.format==='personal'){
