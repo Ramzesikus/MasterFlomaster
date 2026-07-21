@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v24 -->
+<!-- Настрелял на Мастера? — версия v25 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -57,6 +57,10 @@
     text-align:center; margin:14px 0 6px; font-weight:700; }
   .group-sep:first-child{ margin-top:2px; }
   .age-slider-wrap{ text-align:center; }
+  .field-row-2col{ display:flex; gap:12px; margin-bottom:16px; }
+  .field-row-2col > .field{ flex:1; min-width:0; }
+  .field-row-2col #sexRow{ height:100%; }
+  .field-row-2col #sexRow .opt-btn{ flex:1; }
   .age-value{ font-size:2rem; font-weight:700; color:var(--brass); margin-bottom:6px; }
   .age-value .unit{ font-size:0.95rem; color:var(--text-dim); font-weight:500; margin-left:4px; }
   input[type=range]{ width:100%; -webkit-appearance:none; height:6px; border-radius:3px;
@@ -99,9 +103,10 @@
   .modal-title{ font-size:1.05rem; font-weight:700; margin:0 30px 12px 0; }
   .modal-body{ font-size:0.88rem; line-height:1.55; color:var(--text-dim); }
   .modal-body p{ margin:0 0 10px; } .modal-body b{ color:var(--text); }
-  .modal-body table{ width:100%; border-collapse:collapse; margin:0 0 14px; font-size:0.82rem; }
-  .modal-body th, .modal-body td{ border:1px solid var(--line); padding:6px 8px; text-align:left; }
-  .modal-body th{ color:var(--brass); font-weight:700; background:var(--panel-2); }
+  .modal-body table{ width:100%; border-collapse:collapse; margin:0 0 14px; font-size:0.82rem; table-layout:fixed; }
+  .modal-body th, .modal-body td{ border:1px solid var(--line); padding:5px 4px; text-align:center; }
+  .modal-body th:first-child, .modal-body td:first-child{ width:26%; text-align:left; }
+  .modal-body th{ color:var(--brass); font-weight:700; background:var(--panel-2); font-size:0.72rem; line-height:1.25; }
   .modal-body td{ color:var(--text); }
   .modal-close{ position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
     border:1px solid var(--line); background:var(--panel-2); color:var(--text-dim);
@@ -132,15 +137,16 @@
 
   <span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Кто я и что хочу?</span>
   <div class="card">
-    <div class="field">
+  <div class="field-row-2col">
+    <div class="field" style="margin-bottom:0;">
       <span class="field-label">Пол</span>
-      <div class="btn-row" id="sexRow">
+      <div class="btn-row" id="sexRow" style="flex-direction:column;">
         <button class="opt-btn" data-group="sex" data-value="m">Мужчина</button>
         <button class="opt-btn" data-group="sex" data-value="f">Женщина</button>
       </div>
     </div>
 
-    <div class="field age-slider-wrap">
+    <div class="field age-slider-wrap" style="margin-bottom:0;">
       <div style="display:flex; align-items:center; gap:6px; justify-content:center;">
         <span class="field-label" style="text-align:left; display:block; margin-bottom:0;">Возраст</span>
         <button class="q-btn" id="ageInfoBtn" type="button">?</button>
@@ -148,6 +154,7 @@
       <div class="age-value" id="ageValue">18</div>
       <input type="range" id="ageSlider" min="10" max="21" value="18" step="1">
     </div>
+  </div>
 
     <div class="field">
       <span class="field-label">Из чего стреляю</span>
@@ -198,17 +205,18 @@
       1) Положение о Единой всероссийской спортивной классификации<br>
       <i>Утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510.</i><br>
       <i>Действует с 01.09.2025.</i></p>
-      <p>2) Приложение №54 «Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”» к приказу Минспорта России от 09.04.2026 №299.<br>
+      <p>2) «Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”».<br>
+      <i>Приложение №54 к приказу Минспорта России от 09.04.2026 №299.</i><br>
       <i>Действует с 19.06.2026.</i></p>
       <p>3) Правила вида спорта «практическая стрельба».<br>
       <i>Утверждены приказом Минспорта России от 08.08.2019 №624, с изменениями, внесёнными приказами Минспорта России от 12.01.2021 №5, от 12.02.2021 №79, от 04.12.2025 №1086.</i><br>
       <i>Действует с 04.12.2025.</i></p>
       <p>Нормативная база, вероятно, будет корректироваться — в текущих редакциях есть противоречия и недоработки, например:</p>
-      <p>— Мужчина, занявший 2-е место в пневматической дисциплине на Чемпионате России с 80% от лидера, формально не получает ни 1 разряда (нужно было занять место похуже — например, 4-е), ни КМС (нужно минимум 85%).</p>
+      <p>— Мужчина, занявший 2-е место в пневматической дисциплине на Чемпионате России с 80% от лидера, формально не получает ни 1 разряда (<b>нужно было занять место похуже</b> — например, 4-е), ни КМС (нужно минимум 85%).</p>
       <p><i>В приложении вместо диапазона мест, которые необходимо занять на матче, мы указываем «не ниже N места» (формально, это не соответствует нормативной базе).</i></p>
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v24</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v25</p>
     </div>
   </div>
 </div>
@@ -268,7 +276,7 @@
 const WEAPONS = [
   { id:'pistol', label:'Пистолет' },
   { id:'revolver', label:'Револьвер' },
-  { id:'rifle', label:'Ружьё/карабин (в т.ч. КПК)/троеборье' },
+  { id:'rifle', label:'Ружьё, карабин (в т.ч. КПК) и троеборье' },
   { id:'pneumatic', label:'Пневматика (пистолет или карабин)' },
 ];
 
@@ -306,7 +314,7 @@ const TARGET_GROUPS = [
 const TARGET_LABEL = {}; TARGET_GROUPS.forEach(g=>g.items.forEach(i=>TARGET_LABEL[i.id]=i.label));
 const PNEUMATIC_BLOCKED_TARGETS = ['ms','msmk'];
 const PREREQ = { ms:'kms', msmk:'ms' };
-const CATEGORY_LABEL = { adult:'Взрослые (Мужчины/Женщины)', junior:'Юниоры/юниорки (16-20)', youth:'Юноши/девушки (11-15)' };
+const CATEGORY_LABEL = { adult:'Взрослые (Мужчины/женщины)', junior:'Юниоры/юниорки (16-20)', youth:'Юноши/девушки (11-15)' };
 
 /* ============ ВСЁ ОСТАЛЬНОЕ (таблица цифр, тексты пояснений) — приходит с воркера, здесь не хранится ============ */
 let META = null; // GROUP_LABELS, REGIONS, JUDGES, COND_TIER, EXPLAIN — заполняется после fetchMeta()
@@ -320,7 +328,7 @@ try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expa
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
 const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
-const APP_VERSION = "v24";
+const APP_VERSION = "v25";
 
 async function relay(action, extra){
   const resp = await fetch(RELAY_URL, {
@@ -332,15 +340,42 @@ async function relay(action, extra){
   return resp.json();
 }
 
+// повторяет запрос при сбое (сеть недоступна и т.п.) — не сдаётся сразу,
+// пробует снова с растущей паузой, суммарно до ~25 секунд.
+async function relayWithRetry(action, extra, onRetry){
+  const maxTimeMs = 25000;
+  const start = Date.now();
+  let attempt = 0;
+  let lastErr;
+  while(true){
+    attempt++;
+    try{
+      return await relay(action, extra);
+    }catch(e){
+      lastErr = e;
+      const elapsed = Date.now() - start;
+      if(elapsed >= maxTimeMs) break;
+      if(onRetry) onRetry(attempt);
+      const wait = Math.min(1000 * attempt, 4000);
+      if(elapsed + wait >= maxTimeMs){
+        await new Promise(r=>setTimeout(r, Math.max(0, maxTimeMs - elapsed)));
+        break;
+      }
+      await new Promise(r=>setTimeout(r, wait));
+    }
+  }
+  throw lastErr;
+}
+
 async function fetchMeta(){
-  const r = await relay('meta');
+  const r = await relayWithRetry('meta', null, (n)=>showSpinner('Не получилось с первого раза, пробую ещё (попытка '+(n+1)+')...'));
   META = r.meta;
 }
 
 async function fetchProgramsFor(weapon, category, target){
   const key = cacheKey(weapon, category, target);
   if(programsCache[key]) return programsCache[key];
-  const r = await relay('programs', {weapon, category, target});
+  const r = await relayWithRetry('programs', {weapon, category, target}, (n)=>showSpinner('Не получилось с первого раза, пробую ещё (попытка '+(n+1)+')...'));
   programsCache[key] = r.programs;
   return r.programs;
 }
@@ -641,7 +676,7 @@ function render(){
 
   if(!state.category){
     zone.innerHTML = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>
-      <div class="card card-output"><div class="r-headline state-na">В этом возрасте выбранное оружие/цель не доступны.</div></div>`;
+      <div class="card card-output"><div class="r-headline state-na">В этом возрасте выбранное оружие / целевой разряд (звание) недоступны.</div></div>`;
     return;
   }
 
@@ -679,12 +714,12 @@ function render(){
     const pct = unisex ? comp.percent : comp.percent[state.sex];
     const place = unisex ? comp.place : (comp.place ? comp.place[state.sex] : comp.place);
     if(pct==null || (comp.place && !unisex && comp.place[state.sex]==null && comp.place!=null)){
-      html += `<div class="req-grid single"><div class="req-box"><div class="k">Внимание</div><div class="v" style="font-size:1rem;">На этом статусе для выбранного пола нет отдельной нормы</div></div></div>`;
+      html += `<div class="req-grid single"><div class="req-box"><div class="k">Внимание</div><div class="v" style="font-size:1rem;">На этом статусе для выбранного пола нет отдельной нормы.</div></div></div>`;
     } else {
       html += `<div class="req-grid">`;
       html += `<div class="req-box"><div class="k">Процент от победителя</div><div class="v">${pct}<span class="unit">% и выше</span></div></div>`;
       if(place!=null){
-        html += `<div class="req-box"><div class="k">Место</div><div class="v">не ниже ${place}-го</div></div>`;
+        html += `<div class="req-box"><div class="k">Место</div><div class="v">не ниже<br>${place}-го</div></div>`;
       } else {
         html += `<div class="req-box"><div class="k">Место</div><div class="v" style="font-size:1rem;">не требуется</div></div>`;
       }
@@ -730,6 +765,7 @@ function render(){
 
   html += `</div></div>`;
   zone.innerHTML = html;
+  void zone.offsetHeight; // принудительный reflow — лечит визуальные наезды блоков друг на друга в Safari/WebKit после innerHTML
 }
 
 /* ============ СПИННЕР ЗАГРУЗКИ ============ */
