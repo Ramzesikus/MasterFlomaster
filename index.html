@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v6 -->
+<!-- Настрелял на Мастера? — версия v29 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -8,170 +8,114 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root{
-    --bg: #14161a;
-    --panel: #1c1f24;
-    --panel-2: #21252b;
-    --line: #2c3138;
-    --text: #eef0ee;
-    --text-dim: #9aa3ad;
-    --brass: #c9924f;
-    --brass-dim: #7a6142;
-    --ok: #5fb37c;
-    --warn: #e2542c;
-    --radius: 14px;
+    --bg: #14161a; --panel: #1c1f24; --panel-2: #21252b;
+    --line: #2c3138; --text: #eef0ee; --text-dim: #9aa3ad;
+    --brass: #c9924f; --brass-dim: #7a6142;
+    --ok: #5fb37c; --warn: #e2542c; --radius: 14px;
     font-size: 16px;
   }
   *{box-sizing:border-box;}
-  html,body{
-    margin:0; padding:0;
-    background:var(--bg);
-    color:var(--text);
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
+    -webkit-font-smoothing:antialiased; }
   .wrap{ max-width:560px; margin:0 auto; padding:16px 16px 40px; }
-
   header{ display:flex; align-items:flex-start; justify-content:space-between; padding: 6px 2px 18px; position:relative; }
-  header::after{
-    content:""; position:absolute; left:2px; bottom:6px; width:34px; height:2px; background:var(--brass);
-  }
+  header::after{ content:""; position:absolute; left:2px; bottom:6px; width:34px; height:2px; background:var(--brass); }
   h1{ font-size:1.4rem; margin:0; letter-spacing:-0.01em; font-weight:700; line-height:1.25; }
   .head-icons{ display:flex; gap:8px; flex:none; margin-left:12px; }
-  .icon-btn{
-    width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
+  .icon-btn{ width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
     background:var(--panel-2); color:var(--text-dim); display:flex; align-items:center; justify-content:center;
-    cursor:pointer; flex:none;
-  }
+    cursor:pointer; flex:none; }
   .icon-btn svg{ width:18px; height:18px; }
   .icon-btn:active{ transform:scale(0.94); }
-
-  .card{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:16px;
-    margin-bottom:12px;
-  }
-  .card-output{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-left:3px solid var(--brass);
-  }
-
-  .field{ margin-bottom:16px; }
-  .field:last-child{ margin-bottom:0; }
-  .field-label{
-    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em;
-    color:#c3cad3; margin-bottom:8px; display:block; font-weight:700;
-  }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
+  .card-output{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--brass); }
+  .field{ margin-bottom:16px; } .field:last-child{ margin-bottom:0; }
+  .field-label{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--brass); margin-bottom:8px; display:block; font-weight:700; }
   .field-note{ font-size:0.76rem; color:var(--text-dim); margin-top:6px; }
-
   .btn-row{ display:flex; flex-wrap:wrap; gap:8px; }
-  .opt-btn{
-    appearance:none; border:1px solid var(--line); background:var(--panel-2);
+  .opt-btn{ appearance:none; border:1px solid var(--line); background:var(--panel-2);
     color:var(--text); font-size:0.88rem; padding:9px 14px; border-radius:10px;
-    cursor:pointer; transition: all .15s ease; font-family:inherit; line-height:1.2;
-  }
+    cursor:pointer; transition: all .15s ease; font-family:inherit; line-height:1.2; }
   .opt-btn:active{ transform: scale(0.97); }
-  .opt-btn.active{
-    background: var(--brass); border-color: var(--brass); color:#191410; font-weight:700;
-  }
+  .opt-btn.active{ background: var(--brass); border-color: var(--brass); color:#191410; font-weight:700; }
   .opt-btn.disabled{ opacity:0.35; pointer-events:none; }
-
-  select.dd, .dd-btn{
-    width:100%; appearance:none; -webkit-appearance:none; text-align:left;
-    background:var(--panel-2) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%239aa3ad" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 14px center;
-    border:1px solid var(--line); color:var(--text); font-size:0.92rem;
+  .dd-btn{ width:100%; appearance:none; -webkit-appearance:none; text-align:left;
+    background:var(--brass) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23191410" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 14px center;
+    border:1px solid var(--brass); color:#191410; font-size:0.92rem; font-weight:700;
     padding:12px 36px 12px 14px; border-radius:10px; font-family:inherit;
+    display:flex; align-items:center; justify-content:space-between; cursor:pointer; line-height:1.3; }
+  .dd-btn:focus{ outline:2px solid var(--brass-dim); outline-offset:1px; }
+  .dd-btn svg{ display:none; }
+  .dd-btn.invalid{
+    background:var(--panel-2) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%239aa3ad" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 14px center;
+    border-color:var(--line); color:var(--text-dim); font-weight:500;
   }
-  select.dd:focus, .dd-btn:focus{ outline:2px solid var(--brass); outline-offset:1px; }
-  .dd-btn{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; line-height:1.3; }
-  .dd-btn svg{ display:none; } /* стрелка уже нарисована фоном, эта — про запас, скрыта */
-  #compOptionsList .opt-btn{ width:100%; text-align:left; }
-  .group-sep{
-    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim);
-    text-align:center; margin:14px 0 6px; font-weight:700;
-  }
+  #compOptionsList .opt-btn, #targetOptionsList .opt-btn, #weaponOptionsList .opt-btn{ width:100%; text-align:left; }
+  .group-sep{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--brass);
+    text-align:center; margin:14px 0 6px; font-weight:700; }
   .group-sep:first-child{ margin-top:2px; }
-
-  .result-eyebrow{
-    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;
-    color:var(--brass); margin:6px 2px 8px; display:block;
-  }
-
-  /* ---- results ---- */
+  .age-slider-wrap{ text-align:left; }
+  .field-row-2col{ display:flex; gap:12px; margin-bottom:16px; }
+  .field-row-2col > .field{ flex:1; min-width:0; }
+  .field-row-2col #sexRow{ display:flex; flex-direction:column; align-items:stretch; gap:8px; }
+  .field-row-2col #sexRow .opt-btn{ width:90%; }
+  .age-value{ font-size:1.3rem; font-weight:700; color:var(--brass); margin-bottom:6px; margin-top:10px; white-space:nowrap; }
+  .age-value .unit{ font-size:0.95rem; color:var(--text-dim); font-weight:500; margin-left:4px; }
+  input[type=range]{ width:90%; -webkit-appearance:none; height:6px; border-radius:3px;
+    background:var(--panel-2); outline:none; margin-top:6px; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
+    background:var(--brass); cursor:pointer; border:3px solid #191410; }
+  input[type=range]::-moz-range-thumb{ width:26px; height:26px; border-radius:50%;
+    background:var(--brass); cursor:pointer; border:3px solid #191410; }
   #resultZone{ min-height:40px; }
-
-  .r-headline{
-    padding:12px 14px; border-radius:12px; margin-bottom:14px; font-size:0.96rem; line-height:1.4;
-    border:1px solid var(--line);
-  }
-  .r-headline.state-ok{ background:rgba(95,179,124,0.1); border-color:rgba(95,179,124,0.35); }
+  .r-headline{ padding:12px 14px; border-radius:12px; margin-bottom:14px; font-size:0.96rem; line-height:1.4; border:1px solid var(--line); }
+  .spinner-wrap{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px 14px; gap:10px; }
+  .spinner{ width:30px; height:30px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--brass); animation:spin 0.8s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .spinner-wrap .spinner-text{ font-size:0.82rem; color:var(--text-dim); }
+  .load-error{ color:var(--warn); font-size:0.88rem; text-align:center; padding:20px 14px; }
   .r-headline.state-na{ background:rgba(226,84,44,0.1); border-color:rgba(226,84,44,0.35); }
-
   .zachet-line{ font-size:0.82rem; color:var(--text-dim); margin-bottom:10px; }
   .zachet-line b{ color:var(--text); }
-
   .req-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px; }
   .req-grid.single{ grid-template-columns: 1fr; }
-  .req-box{
-    background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
-  }
+  .req-box{ background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
   .req-box .k{ font-size:0.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--text-dim); margin-bottom:6px; }
   .req-box .v{ font-size:1.3rem; font-weight:700; }
   .req-box .v .unit{ font-size:0.85rem; color:var(--text-dim); font-weight:500; margin-left:2px;}
-
   .cond-list{ display:flex; flex-direction:column; gap:8px; }
-  .cond{
-    display:flex; gap:10px; align-items:flex-start; background:var(--panel-2); border:1px solid var(--line);
-    border-radius:12px; padding:11px 13px; font-size:0.87rem; line-height:1.42; color:var(--text);
-  }
+  .cond{ display:flex; gap:10px; align-items:flex-start; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:12px; padding:11px 13px; font-size:0.87rem; line-height:1.42; color:var(--text); }
   .cond .ic{ flex:none; width:19px; height:19px; margin-top:1px; color:var(--brass); }
-  .cond .txt{ flex:1; }
-  .cond .txt b{ color:var(--text); }
-  .cond .txt .dim{ color:var(--text-dim); }
-  .q-btn{
-    flex:none; width:19px; height:19px; border-radius:50%; border:1px solid var(--brass-dim);
+  .cond .txt{ flex:1; } .cond .txt b{ color:var(--text); } .cond .txt .dim{ color:var(--text-dim); }
+  .q-btn{ flex:none; width:19px; height:19px; border-radius:50%; border:1px solid var(--brass-dim);
     background:transparent; color:var(--brass); font-size:0.68rem; font-weight:700; line-height:1;
-    display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:1px;
-    font-family:inherit;
-  }
+    display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:1px; font-family:inherit; }
   .q-btn:active{ transform:scale(0.9); }
-
-  /* ---- modals ---- */
-  .modal-overlay{
-    display:none; position:fixed; inset:0; background:rgba(6,7,8,0.68);
-    align-items:flex-end; justify-content:center; z-index:100; padding:0;
-  }
+  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(6,7,8,0.68);
+    align-items:flex-end; justify-content:center; z-index:100; padding:0; }
   .modal-overlay.open{ display:flex; }
-  .modal-card{
-    width:100%; max-width:560px; background:var(--panel); border:1px solid var(--line);
-    border-radius:18px 18px 0 0; padding:20px 20px 26px; position:relative;
-    max-height:78vh; overflow-y:auto;
-  }
-  @media (min-width:600px){
-    .modal-overlay{ align-items:center; }
-    .modal-card{ border-radius:16px; }
-  }
+  .modal-card{ width:100%; max-width:560px; background:var(--panel); border:1px solid var(--line);
+    border-radius:18px 18px 0 0; padding:20px 20px 26px; position:relative; max-height:78vh; overflow-y:auto; }
+  @media (min-width:600px){ .modal-overlay{ align-items:center; } .modal-card{ border-radius:16px; } }
   .modal-title{ font-size:1.05rem; font-weight:700; margin:0 30px 12px 0; }
   .modal-body{ font-size:0.88rem; line-height:1.55; color:var(--text-dim); }
-  .modal-body p{ margin:0 0 10px; }
-  .modal-body b{ color:var(--text); }
-  .modal-close{
-    position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
+  .modal-body p{ margin:0 0 10px; } .modal-body b{ color:var(--text); }
+  .modal-body table{ width:100%; border-collapse:collapse; margin:0 0 14px; font-size:0.82rem; table-layout:fixed; }
+  .modal-body th, .modal-body td{ border:1px solid var(--line); padding:5px 4px; text-align:center; }
+  .modal-body th:first-child, .modal-body td:first-child{ width:26%; text-align:left; }
+  .modal-body th{ color:var(--brass); font-weight:700; background:var(--panel-2); font-size:0.72rem; line-height:1.25; }
+  .modal-body td{ color:var(--text); }
+  .modal-close{ position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
     border:1px solid var(--line); background:var(--panel-2); color:var(--text-dim);
-    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem;
-  }
-  .modal-body textarea{
-    width:100%; min-height:96px; background:var(--panel-2); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; }
+  .modal-body textarea{ width:100%; min-height:96px; background:var(--panel-2); border:1px solid var(--line);
     border-radius:10px; color:var(--text); font-family:inherit; font-size:0.9rem; padding:11px 12px;
-    resize:vertical; margin-top:10px;
-  }
-  .modal-body textarea:focus{ outline:2px solid var(--brass); outline-offset:1px; }
-  .modal-btn{
-    margin-top:12px; width:100%; padding:12px; border-radius:10px; border:none;
-    background:var(--brass); color:#191410; font-weight:700; font-size:0.92rem; cursor:pointer;
-  }
+    resize:vertical; margin-top:10px; }
+  .modal-btn{ margin-top:12px; width:100%; padding:12px; border-radius:10px; border:none;
+    background:var(--brass); color:#191410; font-weight:700; font-size:0.92rem; cursor:pointer; }
   .modal-btn:active{ transform:scale(0.98); }
   .modal-status{ font-size:0.82rem; color:var(--text-dim); margin-top:8px; min-height:1.2em; }
 </style>
@@ -191,15 +135,26 @@
     </div>
   </header>
 
-  <span class="result-eyebrow" style="color:var(--brass);">Кто я и что хочу?</span>
+  <span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Кто я и что хочу?</span>
   <div class="card">
-    <div class="field">
+  <div class="field-row-2col">
+    <div class="field" style="margin-bottom:0;">
       <span class="field-label">Пол</span>
-      <div class="btn-row" id="sexRow">
+      <div class="btn-row" id="sexRow" style="flex-direction:column;">
         <button class="opt-btn" data-group="sex" data-value="m">Мужчина</button>
         <button class="opt-btn" data-group="sex" data-value="f">Женщина</button>
       </div>
     </div>
+
+    <div class="field age-slider-wrap" style="margin-bottom:0;">
+      <div style="display:flex; align-items:center; gap:6px; justify-content:flex-start;">
+        <span class="field-label" style="text-align:left; display:block; margin-bottom:0;">Возраст</span>
+        <button class="q-btn" id="ageInfoBtn" type="button">?</button>
+      </div>
+      <div class="age-value" id="ageValue">18</div>
+      <input type="range" id="ageSlider" min="10" max="21" value="18" step="1">
+    </div>
+  </div>
 
     <div class="field">
       <span class="field-label">Из чего стреляю</span>
@@ -207,28 +162,26 @@
         <span id="weaponSelectLabel"></span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
       </button>
-    </div>
-
-    <div class="field">
-      <span class="field-label">Текущий разряд / звание</span>
-      <div class="btn-row" id="curRow" style="gap:5px; flex-wrap:nowrap;">
-        <button class="opt-btn" data-group="cur" data-value="0" style="flex:1; padding-left:6px; padding-right:6px; white-space:nowrap;">&lt;1 разряда</button>
-        <button class="opt-btn" data-group="cur" data-value="1" style="flex:1; padding-left:6px; padding-right:6px; white-space:nowrap;">1 разряд</button>
-        <button class="opt-btn" data-group="cur" data-value="2" style="flex:1; padding-left:6px; padding-right:6px; white-space:nowrap;">КМС</button>
-        <button class="opt-btn" data-group="cur" data-value="3" style="flex:1; padding-left:6px; padding-right:6px; white-space:nowrap;">МС</button>
-      </div>
+      <div class="field-note" id="weaponNote"></div>
     </div>
 
     <div class="field">
       <span class="field-label">Хочу получить</span>
-      <div class="btn-row" id="targetRow">
-        <button class="opt-btn" data-group="target" data-value="r1">1 разряд</button>
-        <button class="opt-btn" data-group="target" data-value="kms">КМС</button>
-        <button class="opt-btn" data-group="target" data-value="ms">МС</button>
-      </div>
+      <button class="opt-btn dd-btn" id="targetSelectBtn" type="button">
+        <span id="targetSelectLabel"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
     </div>
 
-    <div class="field">
+    <div class="field" id="categoryField" style="display:none;">
+      <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+        <span class="field-label" style="margin-bottom:0;">Категория</span>
+        <button class="q-btn" id="categoryInfoBtn" type="button">?</button>
+      </div>
+      <div class="btn-row" id="categoryRow"></div>
+    </div>
+
+    <div class="field" id="statusField">
       <span class="field-label">На соревновании</span>
       <button class="opt-btn dd-btn" id="compSelectBtn" type="button">
         <span id="compSelectLabel"></span>
@@ -247,11 +200,23 @@
     <button class="modal-close" data-close="infoModal">×</button>
     <h3 class="modal-title">О приложении</h3>
     <div class="modal-body">
-      <p>Требования, нормы и условия для получения 1 разряда, КМС и МС по практической стрельбе — пистолет и револьвер, взрослые мужчины и женщины.</p>
-      <p><b>Источники:</b><br>
-      1) Положение о Единой всероссийской спортивной классификации (утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510; действует с 01.09.2025).<br>
-      2) Приложение №54 к приказу Минспорта России от 09.04.2026 №299 («Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”»; действует с 19.06.2026).</p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v6</p>
+      <p>Требования, нормы и условия для получения спортивных разрядов и званий по практической стрельбе — все виды оружия, все возрастные категории.</p>
+      <p><b>Нормативная база:</b><br>
+      1) Положение о Единой всероссийской спортивной классификации.<br>
+      <i>Утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510.</i><br>
+      <i>Действует с 01.09.2025.</i></p>
+      <p>2) Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”.<br>
+      <i>Приложение №54 к приказу Минспорта России от 09.04.2026 №299.</i><br>
+      <i>Действует с 19.06.2026.</i></p>
+      <p>3) Правила вида спорта «практическая стрельба».<br>
+      <i>Утверждены приказом Минспорта России от 08.08.2019 №624, с изменениями, внесёнными приказами Минспорта России от 12.01.2021 №5, от 12.02.2021 №79, от 04.12.2025 №1086.</i><br>
+      <i>Действует с 04.12.2025.</i></p>
+      <p>Нормативная база, вероятно, будет корректироваться — в текущих редакциях есть противоречия и недоработки, например:</p>
+      <p>— Мужчина, занявший 2-е место в пневматической дисциплине на Чемпионате России с 80% от лидера, формально не получает ни 1 разряда (нужно было занять место похуже — например, 4-е), ни КМС (нужно минимум 85%).</p>
+      <p><i>В приложении вместо диапазона мест, которые необходимо занять на матче, мы указываем «не ниже N места» (формально, это не соответствует нормативной базе).</i></p>
+      <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
+      <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v29</p>
     </div>
   </div>
 </div>
@@ -275,9 +240,16 @@
   <div class="modal-card">
     <button class="modal-close" data-close="weaponModal">×</button>
     <h3 class="modal-title">Из чего стреляю</h3>
-    <div class="modal-body">
-      <div class="btn-row" id="weaponOptionsList" style="flex-direction:column;"></div>
-    </div>
+    <div class="modal-body"><div class="btn-row" id="weaponOptionsList" style="flex-direction:column;"></div></div>
+  </div>
+</div>
+
+<!-- ===== TARGET PICKER MODAL ===== -->
+<div class="modal-overlay" id="targetModal">
+  <div class="modal-card">
+    <button class="modal-close" data-close="targetModal">×</button>
+    <h3 class="modal-title">Хочу получить</h3>
+    <div class="modal-body"><div class="btn-row" id="targetOptionsList" style="flex-direction:column;"></div></div>
   </div>
 </div>
 
@@ -285,14 +257,12 @@
 <div class="modal-overlay" id="compModal">
   <div class="modal-card">
     <button class="modal-close" data-close="compModal">×</button>
-    <h3 class="modal-title">Статус соревнования</h3>
-    <div class="modal-body">
-      <div class="btn-row" id="compOptionsList" style="flex-direction:column;"></div>
-    </div>
+    <h3 class="modal-title">На соревновании</h3>
+    <div class="modal-body"><div class="btn-row" id="compOptionsList" style="flex-direction:column;"></div></div>
   </div>
 </div>
 
-<!-- ===== EXPLAIN MODAL (динамический) ===== -->
+<!-- ===== EXPLAIN MODAL ===== -->
 <div class="modal-overlay" id="explainModal">
   <div class="modal-card">
     <button class="modal-close" data-close="explainModal">×</button>
@@ -302,126 +272,126 @@
 </div>
 
 <script>
-/* ============ ДАННЫЕ ============ */
+/* ============ КЛИЕНТСКИЕ МИНИМУМЫ (только для интерфейса — не данные из нормативки) ============ */
+const WEAPONS = [
+  { id:'pistol', label:'Пистолет' },
+  { id:'revolver', label:'Револьвер' },
+  { id:'rifle', label:'Ружьё, карабин (в т.ч. КПК), троеборье' },
+  { id:'pneumatic', label:'Пневматика (пистолет или карабин)' },
+];
 
-const RANK_ORDER = { r1:1, kms:2, ms:3 };
-const RANK_LABEL = { below:"ниже 1 разряда", r1:"1 разряд", kms:"КМС", ms:"МС" };
-const CUR_INDEX_TO_KEY = ["below","r1","kms","ms"];
-const PREREQ_LABEL = { r1:null, kms:null, ms:"КМС" };
+// Возраст: сочетаем ЕВСК (минимальный возраст для конкретного разряда/звания по оружию)
+// и Правила вида спорта, Таблица 8 (минимальный возраст допуска к соревнованию по возрастной
+// группе). Берём более строгое из двух правил по каждому оружию — см. "О приложении".
+// youth = 11-15 лет, junior = 16-20 лет, adult = "Мужчины/женщины" (нижний порог входа).
+// Держим на клиенте намеренно (а не на воркере) — иначе ползунок возраста будет дёргаться
+// с сетевой задержкой на каждое движение пальцем.
+const WEAPON_AGE = {
+  pistol:    { youth:13, junior:16, adult:14 },
+  revolver:  { youth:13, junior:16, adult:16 },
+  rifle:     { youth:null, junior:16, adult:16 },
+  pneumatic: { youth:11, junior:16, adult:16 },
+};
+function weaponMinPossibleAge(weaponId){
+  const wa = WEAPON_AGE[weaponId];
+  return Math.min(wa.junior, wa.adult, wa.youth==null?99:wa.youth);
+}
+function adultAgeThreshold(weapon, target){
+  if(weapon==='pistol' && target==='msmk') return 15;
+  return WEAPON_AGE[weapon].adult;
+}
 
-const JUDGES = {
-  r1:  "2 судьи 1 категории + 1 судья 2 категории",
-  kms: "1 судья всероссийской категории + 2 судьи 1 категории",
-  ms:  "3 судьи всероссийской категории"
-};
+const TARGET_GROUPS = [
+  { label:'Разряды', items:[
+    {id:'y3', label:'3 юношеский разряд'}, {id:'y2', label:'2 юношеский разряд'}, {id:'y1', label:'1 юношеский разряд'},
+    {id:'r3', label:'3 разряд'}, {id:'r2', label:'2 разряд'}, {id:'r1', label:'1 разряд'},
+    {id:'kms', label:'КМС'},
+  ]},
+  { label:'Звания', items:[
+    {id:'ms', label:'МС'}, {id:'msmk', label:'МСМК'},
+  ]}
+];
+const TARGET_LABEL = {}; TARGET_GROUPS.forEach(g=>g.items.forEach(i=>TARGET_LABEL[i.id]=i.label));
+const PNEUMATIC_BLOCKED_TARGETS = ['ms','msmk'];
+const PREREQ = { ms:'kms', msmk:'ms' };
+const CATEGORY_LABEL = { adult:'Мужчины/женщины', junior:'Юниоры/юниорки (16-20)', youth:'Юноши/девушки (11-15)' };
 
-const REGIONS_ALLRU = {
-  short: "23 и больше (либо 6–22 по «правилу половинок»)",
-  explain: "<p>В соревнованиях должны участвовать спортсмены не менее чем из 25% регионов России (то есть не менее чем из 23 регионов).</p><p>Если это условие не выполняется, применяется <b>«правило половинок»</b>: допускается участие спортсменов не менее чем из 6 регионов, но все прочие требования/условия нужно выполнить на <b>двух разных соревнованиях</b> с перерывом не более трёх лет.</p><p>Считаются регионы, представленные именно в официальном зачёте — остальные участники соревнования не в счёт.</p>"
-};
-const REGIONS_FO = {
-  short: "не менее 50% регионов округа",
-  explain: "<p>Считаются регионы, представленные именно в официальном зачёте, а не всё соревнование целиком. Точное число зависит от округа — где-то это 5–6 регионов, где-то больше.</p>"
-};
-
-const COND_RESIDENCY = {
-  short: "Нужно быть приписанным к региону-организатору соревнования.",
-  title: "Приписка к региону",
-  explain: "<p>На региональных соревнованиях в официальный зачёт входят только спортсмены, приписанные к региону-организатору — тому, чьё это соревнование, а не к региону, где физически расположена площадка (стрелковый комплекс в одном регионе нередко принимает соревнования соседнего).</p><p>Например, стрелок из Воронежской области может физически выступить на чемпионате Москвы, но не в официальном зачёте москвичей — результат не попадёт в официальный протокол, и разряд/звание по нему не присвоят.</p>"
-};
-const COND_APPLICATION = {
-  short: "Нужно быть включённым в региональную заявку (её готовит региональное отделение федерации).",
-  title: "Региональная заявка",
-  explain: "<p>Участвовать в соревновании можно и без региональной заявки. Но в официальный зачёт (и, соответственно, на разряд/звание) попадают только те, кто в неё включён. Заявку подаёт региональное отделение федерации.</p>"
-};
-
-// tier: 'residency' (региональный уровень — приписка) | 'application' (межрегиональный+ — заявка)
-const COMPETITIONS = {
-  r1: [
-    { id:"subject_champ", label:"Чемпионат субъекта РФ", tier:"residency", group:"regional", minParticipants:4,
-      personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
-    { id:"subject_cup", label:"Финал Кубка субъекта (кроме Москвы и Санкт-Петербурга)", tier:"residency", group:"regional", minParticipants:4,
-      personal:{ place:null, percent:{m:75, f:65} }, team:null, duel:null, regions:null, need2ms:false },
-    { id:"subject_other", label:"Другие соревнования субъекта РФ", group:"regional", blocked:true,
-      blockedMessage:"Недавние изменения ЕВСК убрали возможность получить 1 разряд на этом статусе — для взрослых в пистолете/револьвере норма здесь больше не предусмотрена." },
-    { id:"msk_spb_champ", label:"Чемпионат Москвы / Санкт-Петербурга", tier:"residency", group:"regional", minParticipants:4,
-      personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
-    { id:"fo_champ", label:"Чемпионат федерального округа", tier:"application", group:"interregional", minParticipants:4,
-      personal:{ place:null, percent:{m:65, f:55} }, team:null, duel:null, regions:null, need2ms:false },
-    { id:"interregional_other", label:"Другие межрегиональные соревнования", tier:"application", group:"interregional", minParticipants:4,
-      personal:{ place:null, percent:{m:75, f:65} }, team:null, duel:null, regions:null, need2ms:false },
-  ],
-  kms: [
-    { id:"msk_spb_champ", label:"Чемпионат Москвы / Санкт-Петербурга", tier:"residency", group:"regional", minParticipants:6,
-      personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:85, f:75} }, team:{place:"1–2"}, duel:{place:"1–2"},
-      regions:null, need2ms:true },
-    { id:"fo_champ", label:"Чемпионат федерального округа", tier:"application", group:"interregional", minParticipants:6,
-      personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:85, f:75} }, team:{place:"1–2"}, duel:{place:"1–2"},
-      regions:REGIONS_FO, need2ms:true },
-    { id:"russia_champ", label:"Чемпионат России (ЧР)", tier:"application", group:"allrussian", minParticipants:6,
-      personal:{ place:{m:"1–11", f:"1–8"}, percent:{m:75, f:65} }, team:{place:"1–2"}, duel:{place:"1–2"},
-      regions:REGIONS_ALLRU, need2ms:true },
-    { id:"russia_cup", label:"Финал Кубка России (ФКР)", tier:"application", group:"allrussian", minParticipants:6,
-      personal:{ place:{m:"1–8", f:"1–6"}, percent:{m:75, f:65} }, team:{place:"1–2"}, duel:{place:"1–2"},
-      regions:REGIONS_ALLRU, need2ms:true },
-    { id:"allru_other", label:"Всероссийское соревнование (кроме ЧР и ФКР)", tier:"application", group:"allrussian", minParticipants:6,
-      personal:{ place:{m:"1–5", f:"1–4"}, percent:{m:80, f:70} }, team:{place:"1–2"}, duel:{place:"1–2"},
-      regions:REGIONS_ALLRU, need2ms:true },
-  ],
-  ms: [
-    { id:"russia_champ", label:"Чемпионат России (ЧР)", tier:"application", group:"allrussian", minParticipants:6,
-      personal:{ place:{m:"1–6", f:"1–4"}, percent:{m:85, f:75} }, team:{place:"1"}, duel:{place:"1"},
-      regions:REGIONS_ALLRU, need2ms:true },
-    { id:"russia_cup", label:"Финал Кубка России (ФКР)", tier:"application", group:"allrussian", minParticipants:6,
-      personal:{ place:{m:"1–5", f:"1–3"}, percent:{m:85, f:75} }, team:{place:"1"}, duel:{place:"1"},
-      regions:REGIONS_ALLRU, need2ms:true },
-    { id:"allru_other", label:"Всероссийское соревнование (кроме ЧР и ФКР)", tier:"application", group:"allrussian", minParticipants:6,
-      personal:{ place:{m:"1–3", f:"1–2"}, percent:{m:90, f:80} }, team:{place:"1"}, duel:{place:"1"},
-      regions:REGIONS_ALLRU, need2ms:true },
-  ]
-};
-
-const EXPLAIN = {
-  zachet: {
-    title: "Что такое «зачёт»",
-    body: "<p><b>Зачёт</b> — конкретная комбинация класса, пола и формата (личный/командный/дуэльный), за которую отдельно распределяются места. Например, <i>«Личный зачёт, PRD, женщины»</i> или <i>«Командный зачёт, OPN, мужчины+женщины»</i> — разные зачёты, даже на одном соревновании.</p><p>Зачёты бывают официальными и неофициальными.</p><p><b>Официальный</b> — тот, что прямо указан в положении о соревновании и по которому присваиваются разряды и звания.</p><p><b>Неофициальный</b> — тот, в который входят спортсмены, не включённые в официальный зачёт. Например, стрелок из Воронежской области, выступающий на чемпионате Москвы, физически может участвовать в этом матче, но идёт вне официального зачёта москвичей — в официальный протокол не попадает и разряд/звание по итогам не получает. В рамках неофициальных зачётов возможно произвольное распределение призовых мест (например, по возрастным группам).</p><p>Условие по числу участников/команд считается именно внутри официального зачёта.</p>"
-  },
-  regions: { title: "Условие по регионам", body: "" }, // заполняется динамически
-  twoms: {
-    title: "Условие «2 МС на соревновании»",
-    body: "<p>Речь про <b>всё соревнование целиком</b>, а не только про твой зачёт — эти два МС (или МСМК) могут выступать в любом зачёте того же соревнования, но обязательно в официальном.</p><p>И процент от победителя они должны набрать в своём личном зачёте — тот же процент, что требуется для присвоения на этом статусе соревнования.</p>"
-  },
-  crosspercent: {
-    title: "Почему нужен ещё и личный процент",
-    body: "<p>В командных и дуэльных зачётах места распределяются только по занятому месту, без учёта процента. Но ЕВСК отдельно требует, чтобы в этом же соревновании у спортсмена был личный результат — тот же процент от победителя, что нужен для его личного разряда/звания на этом статусе.</p><p>Без личного процента место в команде/дуэли разряд/звание не даёт.</p>"
-  },
-  cond_residency: { title: COND_RESIDENCY.title, body: COND_RESIDENCY.explain },
-  cond_application: { title: COND_APPLICATION.title, body: COND_APPLICATION.explain }
-};
+/* ============ ВСЁ ОСТАЛЬНОЕ (таблица цифр, тексты пояснений) — приходит с воркера, здесь не хранится ============ */
+let META = null; // GROUP_LABELS, REGIONS, JUDGES, COND_TIER, EXPLAIN — заполняется после fetchMeta()
+const programsCache = {}; // ключ "оружие|категория|цель" -> массив статусов (или null, если ещё не загружено)
+function cacheKey(w,c,t){ return w+'|'+c+'|'+t; }
 
 /* ============ TELEGRAM ============ */
 let tg = null;
-try{
-  tg = window.Telegram && window.Telegram.WebApp;
-  if(tg){ tg.ready(); tg.expand(); }
-}catch(e){}
+try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expand(); } }catch(e){}
 
-/* ============ АНАЛИТИКА / ОБРАТНАЯ СВЯЗЬ (через Telegram Bot API, без сервера) ============
-   Прямой fetch на api.telegram.org с токеном бота — так же, как раньше.
-   ВАЖНО: токен виден в исходнике страницы — ок для личного проекта с закрытой
-   аудиторией, но для широкого распространения стоит спрятать за прокси-сервером.
-   Вставь свои значения ниже. Логируется только факт захода (кто и когда —
-   время видно прямо в чате бота), без лога того, что человек выбирает. */
-const ANALYTICS_BOT_TOKEN = "8976902599:AAFpFT77uvYgh7niWvcq1xWkx5AYYynkEkw";
-const ANALYTICS_CHAT_ID = "-5443571059";
-const APP_VERSION = "v6";
+/* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
+const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
+const APP_SECRET = "MasterFlomasterSecret";
+const APP_VERSION = "v29";
+
+async function relay(action, extra){
+  const resp = await fetch(RELAY_URL, {
+    method:"POST",
+    headers:{"Content-Type":"application/json", "X-App-Secret":APP_SECRET},
+    body: JSON.stringify(Object.assign({action:action}, extra||{}))
+  });
+  if(!resp.ok) throw new Error('relay error ' + resp.status);
+  return resp.json();
+}
+
+// повторяет запрос при сбое (сеть недоступна и т.п.) — не сдаётся сразу,
+// пробует снова с растущей паузой, суммарно до ~25 секунд.
+async function relayWithRetry(action, extra, onRetry){
+  const maxTimeMs = 25000;
+  const start = Date.now();
+  let attempt = 0;
+  let lastErr;
+  while(true){
+    attempt++;
+    try{
+      return await relay(action, extra);
+    }catch(e){
+      lastErr = e;
+      const elapsed = Date.now() - start;
+      if(elapsed >= maxTimeMs) break;
+      if(onRetry) onRetry(attempt);
+      const wait = Math.min(1000 * attempt, 4000);
+      if(elapsed + wait >= maxTimeMs){
+        await new Promise(r=>setTimeout(r, Math.max(0, maxTimeMs - elapsed)));
+        break;
+      }
+      await new Promise(r=>setTimeout(r, wait));
+    }
+  }
+  throw lastErr;
+}
+
+async function fetchMeta(){
+  const r = await relayWithRetry('meta', null, (n)=>showSpinner('Не получилось с первого раза, пробую ещё (попытка '+(n+1)+')...'));
+  META = r.meta;
+}
+
+async function fetchProgramsFor(weapon, category, target){
+  const key = cacheKey(weapon, category, target);
+  if(programsCache[key]) return programsCache[key];
+  const r = await relayWithRetry('programs', {weapon, category, target}, (n)=>showSpinner('Не получилось с первого раза, пробую ещё (попытка '+(n+1)+')...'));
+  programsCache[key] = r.programs;
+  return r.programs;
+}
+
+// подгружает все 3 возрастные категории разом для пары (оружие, цель) — дальше возраст
+// переключается мгновенно, без сети, просто читая уже загруженный кэш.
+async function ensureProgramsLoaded(weapon, target){
+  const cats = ['youth','junior','adult'];
+  await Promise.all(cats.map(c=>fetchProgramsFor(weapon, c, target)));
+}
 
 function getDeviceLabel(){
   try{
     if(tg && tg.platform && tg.platform !== 'unknown'){
       const p = tg.platform;
       if(p === 'ios' || p === 'android') return "смартфон (" + p + ")";
-      if(p === 'android_x' || p === 'ios_x') return "планшет (" + p + ")";
       if(p === 'tdesktop' || p === 'macos') return "компьютер (" + p + ")";
       if(p === 'web' || p === 'weba') return "браузер (" + p + ")";
       return p;
@@ -432,165 +402,229 @@ function getDeviceLabel(){
   if(/iPad|Android(?!.*Mobile)|Tablet/i.test(ua)) return "планшет";
   return "компьютер";
 }
-
 function getUserLabel(){
   try{
     const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-    if(u){
-      return (u.first_name || "") + (u.last_name ? " " + u.last_name : "") +
-        (u.username ? " (@" + u.username + ")" : "") + " [id" + u.id + "]";
-    }
+    if(u){ return (u.first_name||"")+(u.last_name?" "+u.last_name:"")+(u.username?" (@"+u.username+")":"")+" [id"+u.id+"]"; }
   }catch(e){}
   return "не через Telegram";
 }
-
 function sendAnalytics(text){
-  try{
-    fetch("https://api.telegram.org/bot" + ANALYTICS_BOT_TOKEN + "/sendMessage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: ANALYTICS_CHAT_ID, text: text }),
-      keepalive: true
-    }).catch(()=>{});
-  }catch(e){}
+  try{ relay('analytics', {text:text}).catch(()=>{}); }catch(e){}
 }
-
 sendAnalytics("🎯 Зашёл: " + getUserLabel() + " | " + getDeviceLabel() + " | " + APP_VERSION);
 
 /* ============ MODALS ============ */
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('[data-close]').forEach(b=>{
-  b.addEventListener('click', ()=>closeModal(b.dataset.close));
-});
-document.querySelectorAll('.modal-overlay').forEach(ov=>{
-  ov.addEventListener('click', (e)=>{ if(e.target === ov) closeModal(ov.id); });
-});
-
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click', ()=>closeModal(b.dataset.close)));
+document.querySelectorAll('.modal-overlay').forEach(ov=>ov.addEventListener('click', (e)=>{ if(e.target===ov) closeModal(ov.id); }));
 document.getElementById('infoBtn').addEventListener('click', ()=>openModal('infoModal'));
+document.getElementById('ageInfoBtn').addEventListener('click', ()=>openExplain('agecat'));
+document.getElementById('categoryInfoBtn').addEventListener('click', ()=>openExplain('agecat'));
 document.getElementById('feedbackBtn').addEventListener('click', ()=>openModal('feedbackModal'));
-
 document.getElementById('feedbackSend').addEventListener('click', ()=>{
   const text = document.getElementById('feedbackText').value.trim();
   const statusEl = document.getElementById('feedbackStatus');
-  if(!text){ statusEl.textContent = 'Сначала напиши что-нибудь.'; return; }
+  if(!text){ statusEl.textContent='Сначала напиши что-нибудь.'; return; }
   sendAnalytics("✉️ Фидбэк от " + getUserLabel() + ":\n" + text + "\n\n(" + APP_VERSION + ")");
-  statusEl.textContent = 'Отправлено, спасибо.';
-  document.getElementById('feedbackText').value = '';
+  statusEl.textContent='Отправлено, спасибо.';
+  document.getElementById('feedbackText').value='';
 });
-
-function openExplain(key, dynamicBody, dynamicTitle){
-  const e = EXPLAIN[key];
-  document.getElementById('explainTitle').textContent = dynamicTitle || e.title;
-  document.getElementById('explainBody').innerHTML = dynamicBody || e.body;
+function openExplain(key, dynBody, dynTitle){
+  const e = META.EXPLAIN[key];
+  document.getElementById('explainTitle').textContent = dynTitle || e.title;
+  document.getElementById('explainBody').innerHTML = dynBody || e.body;
   openModal('explainModal');
 }
 
 /* ============ STATE ============ */
-const state = { sex:"m", cur:"0", weapon:"pistol_revolver", target:"r1", format:"personal", comp:null };
-
-const WEAPONS = [
-  { id:"pistol_revolver", label:"Пистолет/револьвер" }
-];
+const state = { sex:'m', age:18, weapon:'pistol', target:'r1', category:null, format:'personal', comp:null };
 let explainRegistry = [];
 
 function setActive(group, value){
-  document.querySelectorAll('.opt-btn[data-group="'+group+'"]').forEach(b=>{
-    b.classList.toggle('active', b.dataset.value === value);
-  });
+  document.querySelectorAll('.opt-btn[data-group="'+group+'"]').forEach(b=>b.classList.toggle('active', b.dataset.value===value));
 }
-
 function wireButtons(group, onSet){
   document.querySelectorAll('.opt-btn[data-group="'+group+'"]').forEach(b=>{
-    b.addEventListener('click', ()=>{
-      if(b.classList.contains('disabled')) return;
-      onSet(b.dataset.value);
-      setActive(group, b.dataset.value);
-      render();
-    });
+    b.addEventListener('click', ()=>{ if(b.classList.contains('disabled')) return; onSet(b.dataset.value); setActive(group, b.dataset.value); render(); });
   });
 }
-
-wireButtons('sex', v=>{ state.sex=v; });
-wireButtons('cur', v=>{ state.cur=v; });
-wireButtons('target', v=>{
-  state.target=v;
-  if(state.target === 'r1') state.format = 'personal';
-  populateCompetitions();
-});
-
+wireButtons('sex', v=>state.sex=v);
 setActive('sex', state.sex);
-setActive('cur', state.cur);
-setActive('target', state.target);
 
+/* ---- возраст ---- */
+const ageSlider = document.getElementById('ageSlider');
+const ageValue = document.getElementById('ageValue');
+function ageLabel(v){
+  if(v<=10) return '10 и младше';
+  if(v>=21) return '21 и старше';
+  return String(v);
+}
+function updateAgeLabel(){ ageValue.textContent = ageLabel(state.age); }
+ageSlider.addEventListener('input', ()=>{
+  state.age = parseInt(ageSlider.value,10);
+  updateAgeLabel();
+  recomputeWeaponAvailability();
+  recomputeCategoryAndRender();
+});
+updateAgeLabel();
+
+/* ---- оружие ---- */
 const weaponSelectBtn = document.getElementById('weaponSelectBtn');
 const weaponSelectLabel = document.getElementById('weaponSelectLabel');
-weaponSelectLabel.textContent = WEAPONS.find(w=>w.id===state.weapon).label;
+function ageMeetsWeapon(age, weaponId){
+  const realAge = age>=21 ? 99 : age;
+  return realAge >= weaponMinPossibleAge(weaponId);
+}
+function recomputeWeaponAvailability(){
+  // если текущее оружие недоступно на новом возрасте — подсветим заметкой и блёклым видом кнопки, но не меняем выбор молча
+  const ok = ageMeetsWeapon(state.age, state.weapon);
+  document.getElementById('weaponNote').textContent = ok ? '' : 'В этом возрасте выбранное оружие не доступно.';
+  weaponSelectBtn.classList.toggle('invalid', !ok);
+}
 weaponSelectBtn.addEventListener('click', ()=>{
-  const optsList = document.getElementById('weaponOptionsList');
-  optsList.innerHTML = WEAPONS.map(w=>{
-    const active = w.id === state.weapon ? ' active' : '';
-    return `<button class="opt-btn${active}" data-weapon-id="${w.id}">${w.label}</button>`;
+  const list = document.getElementById('weaponOptionsList');
+  list.innerHTML = WEAPONS.map(w=>{
+    const active = w.id===state.weapon ? ' active' : '';
+    const dis = ageMeetsWeapon(state.age, w.id) ? '' : ' disabled';
+    return `<button class="opt-btn${active}${dis}" data-weapon-id="${w.id}">${w.label}</button>`;
   }).join('');
   openModal('weaponModal');
 });
-document.getElementById('weaponOptionsList').addEventListener('click', (e)=>{
-  const b = e.target.closest('.opt-btn[data-weapon-id]');
-  if(!b) return;
-  state.weapon = b.dataset.weaponId;
-  weaponSelectLabel.textContent = b.textContent;
-  closeModal('weaponModal');
+document.getElementById('weaponOptionsList').addEventListener('click', async (e)=>{
+  const b = e.target.closest('.opt-btn[data-weapon-id]'); if(!b || b.classList.contains('disabled')) return;
+  state.weapon = b.dataset.weaponId; weaponSelectLabel.textContent = b.textContent;
+  closeModal('weaponModal'); recomputeWeaponAvailability();
+  await loadAndRender();
+});
+weaponSelectLabel.textContent = WEAPONS.find(w=>w.id===state.weapon).label;
+
+/* ---- цель ---- */
+const targetSelectBtn = document.getElementById('targetSelectBtn');
+const targetSelectLabel = document.getElementById('targetSelectLabel');
+targetSelectBtn.addEventListener('click', ()=>{
+  const list = document.getElementById('targetOptionsList');
+  let html = '';
+  TARGET_GROUPS.forEach(g=>{
+    html += `<div class="group-sep">— ${g.label} —</div>`;
+    g.items.forEach(it=>{
+      const active = it.id===state.target ? ' active' : '';
+      const dis = (state.weapon==='pneumatic' && PNEUMATIC_BLOCKED_TARGETS.includes(it.id)) ? ' disabled' : '';
+      html += `<button class="opt-btn${active}${dis}" data-target-id="${it.id}">${it.label}${dis?' (недоступно на пневматике)':''}</button>`;
+    });
+  });
+  list.innerHTML = html;
+  openModal('targetModal');
+});
+document.getElementById('targetOptionsList').addEventListener('click', async (e)=>{
+  const b = e.target.closest('.opt-btn[data-target-id]'); if(!b || b.classList.contains('disabled')) return;
+  state.target = b.dataset.targetId; targetSelectLabel.textContent = TARGET_LABEL[state.target];
+  closeModal('targetModal');
+  await loadAndRender();
+});
+targetSelectLabel.textContent = TARGET_LABEL[state.target];
+
+/* ---- категория ---- */
+function availableCategories(){
+  const age = state.age;
+  const realAge = age>=21 ? 99 : age;
+  const wa = WEAPON_AGE[state.weapon];
+  const cats = [];
+  if(wa.youth!=null && age>=11 && age<=15 && realAge>=wa.youth) cats.push('youth');
+  if(age>=16 && age<=20 && realAge>=wa.junior) cats.push('junior');
+  if(realAge>=adultAgeThreshold(state.weapon, state.target)) cats.push('adult');
+  // дополнительно фильтруем по тому, есть ли реальные данные для (оружие,категория,цель) —
+  // читаем СИНХРОННО из кэша, который к этому моменту уже загружен через ensureProgramsLoaded()
+  return cats.filter(c=> effectivePrograms(state.weapon, c, state.target).length>0);
+}
+function effectivePrograms(weapon, category, target){
+  let arr = programsCache[cacheKey(weapon,category,target)] || [];
+  // юниоры/юноши на огнестреле без отдельных строк -> используют взрослую таблицу (кроме y1-y3, которых на огнестреле не бывает)
+  if(arr.length===0 && weapon!=='pneumatic' && (category==='junior') && !target.startsWith('y')){
+    arr = programsCache[cacheKey(weapon,'adult',target)] || [];
+  }
+  return arr;
+}
+function recomputeCategoryAndRender(){
+  const cats = availableCategories();
+  const field = document.getElementById('categoryField');
+  const row = document.getElementById('categoryRow');
+  if(cats.length<=1){
+    state.category = cats[0] || null;
+    field.style.display = 'none';
+  } else {
+    field.style.display = '';
+    if(!cats.includes(state.category)) state.category = cats[0];
+    row.innerHTML = cats.map(c=>{
+      const active = c===state.category ? ' active' : '';
+      return `<button class="opt-btn${active}" data-cat-id="${c}">${CATEGORY_LABEL[c]}</button>`;
+    }).join('');
+  }
+  populateCompetitions();
+}
+document.getElementById('categoryRow').addEventListener('click', (e)=>{
+  const b = e.target.closest('.opt-btn[data-cat-id]'); if(!b) return;
+  state.category = b.dataset.catId;
+  document.querySelectorAll('#categoryRow .opt-btn').forEach(x=>x.classList.toggle('active', x===b));
+  populateCompetitions(); // данные уже в кэше, сеть не нужна
 });
 
+/* ---- загрузка данных при смене оружия/цели (возраст и категория — без сети, из кэша) ---- */
+async function loadAndRender(){
+  showSpinner();
+  try{
+    await ensureProgramsLoaded(state.weapon, state.target);
+  }catch(e){
+    showLoadError();
+    return;
+  }
+  recomputeCategoryAndRender();
+}
+
+/* ---- статус соревнования ---- */
 const compSelectBtn = document.getElementById('compSelectBtn');
 const compSelectLabel = document.getElementById('compSelectLabel');
-const GROUP_LABELS = { regional:"Региональные соревнования", interregional:"Межрегиональные соревнования", allrussian:"Всероссийские соревнования" };
-
 compSelectBtn.addEventListener('click', ()=>{
-  const list = COMPETITIONS[state.target];
-  const optsList = document.getElementById('compOptionsList');
-  let html = '';
-  let lastGroup = null;
+  const list = currentPrograms();
+  const opts = document.getElementById('compOptionsList');
+  let html = ''; let lastGroup = null;
   list.forEach(c=>{
-    if(c.group !== lastGroup){
-      html += `<div class="group-sep">— ${GROUP_LABELS[c.group]} —</div>`;
-      lastGroup = c.group;
-    }
-    const active = c.id === state.comp ? ' active' : '';
+    if(c.group!==lastGroup){ html += `<div class="group-sep">— ${META.GROUP_LABELS[c.group]} —</div>`; lastGroup=c.group; }
+    const active = c.id===state.comp ? ' active' : '';
     html += `<button class="opt-btn${active}" data-comp-id="${c.id}">${c.label}</button>`;
   });
-  optsList.innerHTML = html;
+  opts.innerHTML = html || '<div class="field-note">Нет доступных соревнований для этой комбинации.</div>';
   openModal('compModal');
 });
 document.getElementById('compOptionsList').addEventListener('click', (e)=>{
-  const b = e.target.closest('.opt-btn[data-comp-id]');
-  if(!b) return;
-  state.comp = b.dataset.compId;
-  compSelectLabel.textContent = b.textContent;
-  closeModal('compModal');
-  render();
+  const b = e.target.closest('.opt-btn[data-comp-id]'); if(!b) return;
+  state.comp = b.dataset.compId; compSelectLabel.textContent = b.textContent;
+  closeModal('compModal'); render();
 });
-
+function currentPrograms(){ return effectivePrograms(state.weapon, state.category, state.target); }
 function populateCompetitions(){
-  const list = COMPETITIONS[state.target];
-  state.comp = list[0].id;
-  compSelectLabel.textContent = list[0].label;
+  const list = currentPrograms();
+  if(list.length===0){
+    state.comp = null; compSelectLabel.textContent = 'нет доступных соревнований';
+    compSelectBtn.classList.add('invalid');
+    render(); return;
+  }
+  compSelectBtn.classList.remove('invalid');
+  if(!list.find(c=>c.id===state.comp)){ state.comp = list[0].id; }
+  compSelectLabel.textContent = list.find(c=>c.id===state.comp).label;
   render();
 }
-populateCompetitions();
 
-// клики по кнопкам формата — живут внутри #resultZone, навешиваем через делегирование
+/* ---- формат участия (в результатах) ---- */
 document.getElementById('resultZone').addEventListener('click', (e)=>{
   const fBtn = e.target.closest('.opt-btn[data-group="format"]');
-  if(fBtn && !fBtn.classList.contains('disabled')){
-    state.format = fBtn.dataset.value;
-    render();
-    return;
-  }
+  if(fBtn && !fBtn.classList.contains('disabled')){ state.format = fBtn.dataset.value; render(); return; }
+  const qBtn = e.target.closest('.q-btn');
+  if(qBtn){ const idx = qBtn.dataset.registryIdx; if(idx!==undefined && explainRegistry[idx]) explainRegistry[idx](); }
 });
 
-/* ============ RENDER ============ */
-
+/* ============ ИКОНКИ ============ */
 function icon(name){
   const icons = {
     people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
@@ -598,160 +632,165 @@ function icon(name){
     gavel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7 3.2v5.3c0 4.6-3 8.7-7 10.5-4-1.8-7-5.9-7-10.5V5.7z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
     flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22V4"/><path d="M4 4h13l-2 4 2 4H4"/></svg>',
     star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9 12 2"/></svg>',
-    percent:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>'
+    percent:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>',
+    arrowUp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>',
+    id:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="7" y1="9" x2="12" y2="9"/><line x1="7" y1="13" x2="15" y2="13"/><path d="M17 15v-2a1.5 1.5 0 0 1 3 0v2"/></svg>'
   };
   return icons[name] || '';
 }
+function cond(ic, text){ return `<div class="cond"><span class="ic">${icon(ic)}</span><span class="txt">${text}</span></div>`; }
+function condQ(ic, text, onOpen){
+  const idx = explainRegistry.length; explainRegistry.push(onOpen);
+  return `<div class="cond"><span class="ic">${icon(ic)}</span><span class="txt">${text}</span><button class="q-btn" data-registry-idx="${idx}">?</button></div>`;
+}
 
-function formatButtonsHtml(){
-  const disabled = state.target === 'r1';
+/* ============ ФОРМАТ УЧАСТИЯ ============ */
+function formatButtonsHtml(comp){
+  const teamAvailable = comp && comp.team != null;
+  const disabled = !teamAvailable;
   const btn = (val, label) => {
-    const active = state.format === val ? ' active' : '';
-    const dis = (disabled && val !== 'personal') ? ' disabled' : '';
+    const active = state.format===val ? ' active' : '';
+    const dis = (disabled && val!=='personal') ? ' disabled' : '';
     return `<button class="opt-btn${active}${dis}" data-group="format" data-value="${val}">${label}</button>`;
   };
-  let html = `<div class="field">
-    <span class="field-label">Формат участия</span>
-    <div class="btn-row">
-      ${btn('personal','Личное')}
-      ${btn('team','Командное')}
-      ${btn('duel','Дуэльное')}
-    </div>`;
-  if(disabled){
-    html += `<div class="field-note">1 разряд можно получить только в личном зачёте.</div>`;
-  }
+  let html = `<div class="field"><span class="field-label">Формат участия</span><div class="btn-row">${btn('personal','Личное')}${btn('team','Командное')}${btn('duel','Дуэльное')}</div>`;
+  if(disabled) html += `<div class="field-note">Получить ${TARGET_LABEL[state.target]} в командном или дуэльном зачёте нельзя, только в личном зачёте.</div>`;
   html += `</div>`;
   return html;
 }
 
-function zachetLabel(){
-  if(state.format === 'personal') return state.sex === 'm' ? 'Мужчины' : 'Женщины';
+function zachetLabel(unisex){
+  if(unisex){
+    if(state.category==='youth') return 'Юноши/девушки (без разбивки по полу)';
+    if(state.category==='junior') return 'Юниоры/юниорки (без разбивки по полу)';
+    return 'Юноши/девушки или юниоры/юниорки (без разбивки по полу)';
+  }
+  if(state.format==='personal') return state.sex==='m' ? 'Мужчины' : 'Женщины';
   return 'Мужчины+женщины';
 }
 
+/* ============ RENDER ============ */
 function render(){
   const zone = document.getElementById('resultZone');
-  const curIdx = parseInt(state.cur, 10);
-  const targetIdx = RANK_ORDER[state.target];
-  const curKey = CUR_INDEX_TO_KEY[curIdx];
+  explainRegistry = [];
 
-  if(curIdx >= targetIdx){
-    zone.innerHTML = `
-      <span class="result-eyebrow">Что для этого нужно?</span>
-      <div class="card card-output">
-        <div class="r-headline state-ok">У тебя уже есть <b>${RANK_LABEL[curKey]}</b>.</div>
-      </div>`;
+  if(!state.category){
+    zone.innerHTML = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>
+      <div class="card card-output"><div class="r-headline state-na">В этом возрасте выбранное оружие / целевой разряд (звание) недоступны.</div></div>`;
     return;
   }
 
-  const prereq = PREREQ_LABEL[state.target];
-  if(prereq && curIdx < targetIdx - 1){
-    zone.innerHTML = `
-      <span class="result-eyebrow">Что для этого нужно?</span>
-      <div class="card card-output">
-        <div class="r-headline state-na">Пока не получится: для <b>${RANK_LABEL[state.target]}</b> сначала нужен <b>${prereq}</b>.</div>
-      </div>`;
+  const list = currentPrograms();
+  const comp = list.find(c=>c.id===state.comp) || list[0];
+
+  if(!comp){
+    zone.innerHTML = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>
+      <div class="card card-output"><div class="r-headline state-na">Для этой комбинации возраста/оружия/цели подходящих статусов соревнований в ЕВСК не нашлось.</div></div>`;
     return;
   }
-
-  const list = COMPETITIONS[state.target];
-  const comp = list.find(c=>c.id === state.comp) || list[0];
 
   if(comp.blocked){
-    zone.innerHTML = `
-      <span class="result-eyebrow">Что для этого нужно?</span>
-      <div class="card card-output">
-        <div class="r-headline state-na">${comp.blockedMessage}</div>
-      </div>`;
+    zone.innerHTML = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>
+      <div class="card card-output"><div class="r-headline state-na">${comp.blockedMessage}</div></div>`;
     return;
   }
 
-  const fmtData = comp[state.format];
+  const unisex = (typeof comp.percent === 'number');
+  if(comp.team == null && state.format !== 'personal'){ state.format = 'personal'; }
+  const fmtData = state.format==='personal' ? null : comp.team;
 
-  let html = `<span class="result-eyebrow">Что для этого нужно?</span><div class="card card-output">`;
+  let html = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>`;
+  html += `<div class="card card-output">`;
 
-  html += formatButtonsHtml();
+  html += formatButtonsHtml(comp);
+  html += `<div class="zachet-line">Зачёт: <b>${zachetLabel(unisex)}</b></div>`;
 
-  html += `<div class="zachet-line">Зачёт: <b>${zachetLabel()}</b></div>`;
+  const prereq = PREREQ[state.target];
+  if(prereq){
+    html += `<div style="margin-bottom:8px;">${condQ('arrowUp', `Нужно уже иметь: <b>${TARGET_LABEL[prereq]}</b>.`, ()=>openExplain('prereq'))}</div>`;
+  }
 
-  if(state.format === 'personal'){
-    const pct = fmtData.percent[state.sex];
-    const place = fmtData.place ? fmtData.place[state.sex] : null;
-    html += `<div class="req-grid">`;
-    html += `<div class="req-box"><div class="k">Процент от победителя</div><div class="v">${pct}<span class="unit">% и выше</span></div></div>`;
-    if(place){
-      html += `<div class="req-box"><div class="k">Место</div><div class="v">${place}</div></div>`;
+  if(state.format==='personal'){
+    const pct = unisex ? comp.percent : comp.percent[state.sex];
+    const place = unisex ? comp.place : (comp.place ? comp.place[state.sex] : comp.place);
+    if(pct==null || (comp.place && !unisex && comp.place[state.sex]==null && comp.place!=null)){
+      html += `<div class="req-grid single"><div class="req-box"><div class="k">Внимание</div><div class="v" style="font-size:1rem;">На этом статусе для выбранного пола нет отдельной нормы.</div></div></div>`;
     } else {
-      html += `<div class="req-box"><div class="k">Место</div><div class="v" style="font-size:1rem;">не требуется</div></div>`;
+      html += `<div class="req-grid">`;
+      html += `<div class="req-box"><div class="k">Процент от победителя</div><div class="v">${pct}<span class="unit">% и выше</span></div></div>`;
+      if(place!=null){
+        html += `<div class="req-box"><div class="k">Место</div><div class="v">не ниже<br>${place}-го</div></div>`;
+      } else {
+        html += `<div class="req-box"><div class="k">Место</div><div class="v" style="font-size:1rem;">не требуется</div></div>`;
+      }
+      html += `</div>`;
     }
-    html += `</div>`;
   } else {
-    html += `<div class="req-grid single">`;
-    html += `<div class="req-box"><div class="k">Место</div><div class="v">${fmtData.place}</div></div>`;
-    html += `</div>`;
+    html += `<div class="req-grid single"><div class="req-box"><div class="k">Место</div><div class="v">не ниже ${fmtData}-го</div></div></div>`;
   }
 
   html += `<div class="cond-list">`;
 
-  if(state.format !== 'personal'){
-    const personalPct = comp.personal.percent[state.sex];
+  if(state.format!=='personal'){
+    const personalPct = unisex ? comp.percent : comp.percent[state.sex];
     html += condQ('percent', `Дополнительно нужен личный результат: <b>${personalPct}% и выше</b> от победителя в личном зачёте на этом же соревновании.`, ()=>openExplain('crosspercent'));
   }
 
   if(comp.minParticipants){
-    const unit = state.format === 'team' ? 'команд' : 'участников';
+    const unit = state.format==='team' ? 'команд' : 'участников';
     html += condQ('people', `Не менее <b>${comp.minParticipants} ${unit}</b> в зачёте.`, ()=>openExplain('zachet'));
   }
 
   if(comp.regions){
-    html += condQ('map', `Регионы в официальном зачёте: <b>${comp.regions.short}</b>.`, ()=>openExplain('regions', comp.regions.explain));
+    const r = META.REGIONS[comp.regions];
+    html += condQ('map', `Регионы в официальном зачёте: <b>${r.short}</b>.`, ()=>openExplain('regions', r.explain));
   }
 
   if(comp.need2ms){
-    const need2msPct = fmtData.percent ? fmtData.percent[state.sex] : comp.personal.percent[state.sex];
-    html += condQ('star', `Участие в соревновании не менее <b>2 МС/МСМК</b> в официальном зачёте, которые набрали не менее <b>${need2msPct}%</b> от победителя.`, ()=>openExplain('twoms'));
+    html += condQ('star', `Участие в соревновании не менее <b>2 МС/МСМК</b> в официальном зачёте, которые набрали не менее <b>${unisex?comp.percent:comp.percent[state.sex]}%</b> от победителя.`, ()=>openExplain('twoms'));
   }
 
-  html += cond('gavel', `Судьи: <b>${JUDGES[state.target]}</b>.`);
+  if(comp.judges){
+    html += cond('gavel', `Судьи: <b>${META.JUDGES[comp.judges]}</b>.`);
+  }
 
-  if(comp.tier === 'residency'){
-    html += condQ('flag', COND_RESIDENCY.short, ()=>openExplain('cond_residency'));
-  } else if(comp.tier === 'application'){
-    html += condQ('flag', COND_APPLICATION.short, ()=>openExplain('cond_application'));
+  if(comp.tier && META.COND_TIER[comp.tier]){
+    const t = META.COND_TIER[comp.tier];
+    html += condQ('flag', t.short, ()=>openExplain(comp.tier==='residency'?'cond_residency':(comp.tier==='application'?'cond_application':'cond_national'), t.explain, t.title));
+  }
+
+  if(state.age < 18 && state.weapon !== 'pneumatic'){
+    html += condQ('id', `Нужно личное или нотариально удостоверенное письменное согласие законного представителя на передачу оружия и патронов.`, ()=>openExplain('consent'));
   }
 
   html += `</div></div>`;
-
   zone.innerHTML = html;
+  void zone.offsetHeight; // принудительный reflow — лечит визуальные наезды блоков друг на друга в Safari/WebKit после innerHTML
 }
 
-function cond(ic, text){
-  return `<div class="cond"><span class="ic">${icon(ic)}</span><span class="txt">${text}</span></div>`;
+/* ============ СПИННЕР ЗАГРУЗКИ ============ */
+function showSpinner(text){
+  document.getElementById('resultZone').innerHTML =
+    `<div class="card card-output"><div class="spinner-wrap"><div class="spinner"></div><div class="spinner-text">${text||'Загружаю требования...'}</div></div></div>`;
+}
+function showLoadError(){
+  document.getElementById('resultZone').innerHTML =
+    `<div class="card card-output"><div class="load-error">Не получилось загрузить данные. Проверь соединение и попробуй ещё раз (смени, например, оружие туда-обратно).</div></div>`;
 }
 
-function condQ(ic, text, onOpen){
-  const idx = explainRegistry.length;
-  explainRegistry.push(onOpen);
-  return `<div class="cond"><span class="ic">${icon(ic)}</span><span class="txt">${text}</span><button class="q-btn" data-registry-idx="${idx}">?</button></div>`;
-}
-
-document.getElementById('resultZone').addEventListener('click', (e)=>{
-  const btn = e.target.closest('.q-btn');
-  if(!btn) return;
-  const idx = btn.dataset.registryIdx;
-  if(idx !== undefined && explainRegistry[idx]){
-    explainRegistry[idx]();
+/* ============ ИНИЦИАЛИЗАЦИЯ ============ */
+async function boot(){
+  showSpinner('Загружаю приложение...');
+  try{
+    await Promise.all([ fetchMeta(), ensureProgramsLoaded(state.weapon, state.target) ]);
+  }catch(e){
+    showLoadError();
+    return;
   }
-});
-
-render = (function(origRender){
-  return function(){
-    explainRegistry = [];
-    origRender();
-  };
-})(render);
-
-render();
+  recomputeWeaponAvailability();
+  recomputeCategoryAndRender();
+}
+boot();
 </script>
 </body>
 </html>
