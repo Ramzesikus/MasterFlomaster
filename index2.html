@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v25 -->
+<!-- Настрелял на Мастера? — версия v26 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -59,9 +59,9 @@
   .age-slider-wrap{ text-align:center; }
   .field-row-2col{ display:flex; gap:12px; margin-bottom:16px; }
   .field-row-2col > .field{ flex:1; min-width:0; }
-  .field-row-2col #sexRow{ height:100%; }
-  .field-row-2col #sexRow .opt-btn{ flex:1; }
-  .age-value{ font-size:2rem; font-weight:700; color:var(--brass); margin-bottom:6px; }
+  .field-row-2col #sexRow{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+  .field-row-2col #sexRow .opt-btn{ width:auto; padding-left:16px; padding-right:16px; }
+  .age-value{ font-size:1.3rem; font-weight:700; color:var(--brass); margin-bottom:6px; white-space:nowrap; }
   .age-value .unit{ font-size:0.95rem; color:var(--text-dim); font-weight:500; margin-left:4px; }
   input[type=range]{ width:100%; -webkit-appearance:none; height:6px; border-radius:3px;
     background:var(--panel-2); outline:none; margin-top:6px; }
@@ -147,7 +147,7 @@
     </div>
 
     <div class="field age-slider-wrap" style="margin-bottom:0;">
-      <div style="display:flex; align-items:center; gap:6px; justify-content:center;">
+      <div style="display:flex; align-items:center; gap:6px; justify-content:flex-start;">
         <span class="field-label" style="text-align:left; display:block; margin-bottom:0;">Возраст</span>
         <button class="q-btn" id="ageInfoBtn" type="button">?</button>
       </div>
@@ -212,11 +212,11 @@
       <i>Утверждены приказом Минспорта России от 08.08.2019 №624, с изменениями, внесёнными приказами Минспорта России от 12.01.2021 №5, от 12.02.2021 №79, от 04.12.2025 №1086.</i><br>
       <i>Действует с 04.12.2025.</i></p>
       <p>Нормативная база, вероятно, будет корректироваться — в текущих редакциях есть противоречия и недоработки, например:</p>
-      <p>— Мужчина, занявший 2-е место в пневматической дисциплине на Чемпионате России с 80% от лидера, формально не получает ни 1 разряда (<b>нужно было занять место похуже</b> — например, 4-е), ни КМС (нужно минимум 85%).</p>
+      <p>— Мужчина, занявший 2-е место в пневматической дисциплине на Чемпионате России с 80% от лидера, формально не получает ни 1 разряда (нужно было занять место похуже — например, 4-е), ни КМС (нужно минимум 85%).</p>
       <p><i>В приложении вместо диапазона мест, которые необходимо занять на матче, мы указываем «не ниже N места» (формально, это не соответствует нормативной базе).</i></p>
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v25</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v26</p>
     </div>
   </div>
 </div>
@@ -328,7 +328,7 @@ try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expa
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
 const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
-const APP_VERSION = "v25";
+const APP_VERSION = "v26";
 
 async function relay(action, extra){
   const resp = await fetch(RELAY_URL, {
