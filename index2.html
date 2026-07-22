@@ -125,13 +125,15 @@
     color:var(--text); font-family:inherit; font-size:0.92rem; padding:11px 12px; margin-top:8px; }
   .stars-input:focus{ outline:2px solid var(--brass); outline-offset:1px; }
 
-  /* ===== ТАБЫ ЭКРАНОВ ===== */
-  .tab-bar-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; border-bottom:1px solid var(--line); }
+  /* ===== ТАБЫ ЭКРАНОВ (прилипают к верху) ===== */
+  .tab-bar-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; border-bottom:1px solid var(--line);
+    position:sticky; top:0; background:var(--bg); z-index:20; padding-top:10px; }
   .tab-bar{ display:flex; gap:18px; }
   .tab-btn{ appearance:none; border:none; border-bottom:2px solid transparent; background:none; color:var(--text-dim);
     font-size:0.92rem; font-weight:700; padding:9px 2px 10px; cursor:pointer; font-family:inherit; margin-bottom:-1px; }
   .tab-btn.active{ color:var(--brass); border-bottom-color:var(--brass); }
   .tab-bar-row .head-icons{ margin-left:0; margin-bottom:8px; }
+  .ekp-sticky-row{ position:sticky; top:41px; background:var(--bg); z-index:19; padding:10px 0 12px; margin-bottom:0 !important; }
 
   /* ===== ССЫЛКА НА ЕКП ИЗ ТРЕБОВАНИЙ ===== */
   .ekp-link-btn{ appearance:none; border:none; background:none; color:var(--brass); font-size:0.82rem;
@@ -145,20 +147,24 @@
     font-size:0.78rem; padding:6px 12px; border-radius:14px; cursor:pointer; font-family:inherit; white-space:nowrap; }
   .chip.active{ background:var(--brass); border-color:var(--brass); color:#191410; font-weight:700; }
   .ekp-view-toggle{ appearance:none; border:1px solid var(--line); background:var(--panel-2); border-radius:8px;
-    padding:4px; display:flex; gap:3px; cursor:pointer; flex:none; }
+    padding:4px; display:flex; gap:3px; cursor:pointer; flex:none; align-items:center; justify-content:center; width:34px; height:34px; }
+  .ekp-view-toggle svg{ width:18px; height:18px; color:var(--text-dim); }
+  .ekp-view-toggle.active-toggle{ background:var(--brass); border-color:var(--brass); }
+  .ekp-view-toggle.active-toggle svg{ color:#191410; }
   .tgl-icon{ width:22px; height:22px; border-radius:6px; display:flex; flex-direction:column; justify-content:center; gap:2px; padding:0 5px; }
   .tgl-compact{ background:var(--panel); } .tgl-compact i{ height:2px; background:var(--text-dim); border-radius:1px; }
   .tgl-full{ background:var(--brass); } .tgl-full i{ height:5px; background:#191410; border-radius:1px; }
 
-  .ekp-row{ display:grid; grid-template-columns:72px 1fr 92px; align-items:center; gap:8px;
-    padding:10px 12px; border-radius:10px; background:var(--panel); margin-bottom:6px; }
+  .ekp-row{ display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:10px;
+    background:var(--panel); margin-bottom:6px; }
   .ekp-row.state-past{ opacity:0.45; }
   .ekp-row.state-live{ background:var(--panel-2); border-left:3px solid var(--brass); }
-  .ekp-row .d{ font-size:0.76rem; color:var(--text-dim); white-space:nowrap; }
+  .ekp-row .line1{ display:flex; justify-content:space-between; gap:10px; }
+  .ekp-row .d{ font-size:0.76rem; color:var(--text-dim); white-space:nowrap; flex:none; }
   .ekp-row.state-live .d{ color:var(--brass); font-weight:700; }
+  .ekp-row .p{ font-size:0.76rem; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:right; }
   .ekp-row .n{ font-size:0.85rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .ekp-row.state-live .n{ font-weight:700; }
-  .ekp-row .p{ font-size:0.76rem; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:right; }
 
   .ekp-card{ padding:12px 14px; border-radius:12px; background:var(--panel); margin-bottom:8px; }
   .ekp-card.state-past{ opacity:0.45; }
@@ -263,10 +269,13 @@
   </div>
 
   <div id="screenEkp" style="display:none;">
-    <div class="ekp-toprow">
-      <span style="font-size:12px; color:var(--text-dim); flex:none;">Статус матча:</span>
+    <div class="ekp-toprow ekp-sticky-row">
+      <span style="font-size:12px; color:var(--text-dim); flex:none;">Матчи:</span>
       <div class="chip-row" id="ekpStatusChips" style="flex:1;"></div>
       <button class="q-btn" id="ekpStatusInfoBtn" type="button">?</button>
+      <button class="ekp-view-toggle" id="ekpHidePastToggle" type="button" aria-label="Не показывать прошедшие">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+      </button>
       <button class="ekp-view-toggle" id="ekpViewToggle" type="button" aria-label="Переключить вид">
         <span class="tgl-icon tgl-compact"><i></i><i></i><i></i></span>
         <span class="tgl-icon tgl-full" style="display:none;"><i></i><i></i></span>
@@ -443,7 +452,7 @@ let tg = null;
 try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expand(); } }catch(e){}
 
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
-const RELAY_URL = "https://master-flomaster-relay-test.khristoforov-ra.workers.dev";
+const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
 const APP_VERSION = "v33-test";
 
@@ -953,6 +962,7 @@ function render(){
   const zone = document.getElementById('resultZone');
 
   if(!state.category){
+    updateGotoEkpBtn(null);
     zone.innerHTML = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>
       <div class="card card-output"><div class="r-headline state-na">В этом возрасте выбранное оружие / целевой разряд (звание) недоступны.</div></div>`;
     return;
@@ -1056,11 +1066,18 @@ function render(){
    Показываем только если выбранный статус попадает в ЕКП (межрегиональный/всероссийский/
    международный уровень) — региональные и муниципальные статусы там просто отсутствуют. */
 const EKP_GROUPS = ['interregional','allrussian','international'];
+const GROUP_TO_EKP_STATUS = { interregional:'МРС', allrussian:'ВС', international:'МЕЖД' };
+const APP_WEAPON_TO_EKP = { pistol:['Пистолет'], revolver:['Револьвер'], rifle:['Карабин','КПК','Ружьё','Троеборье'], pneumatic:['Пневматика'] };
 function updateGotoEkpBtn(comp){
   const btn = document.getElementById('gotoEkpBtn');
-  if(comp && EKP_GROUPS.includes(comp.group)){
+  if(comp && !comp.blocked && EKP_GROUPS.includes(comp.group)){
     btn.style.display = '';
-    btn.onclick = ()=>{ switchTab('ekp'); };
+    btn.onclick = ()=>{
+      ekpFilter.status = new Set([GROUP_TO_EKP_STATUS[comp.group]]);
+      ekpFilter.weapon = new Set(APP_WEAPON_TO_EKP[state.weapon] || []);
+      switchTab('ekp');
+      ensureEkpLoaded().then(()=>{ renderEkpChips(); renderEkpList(); });
+    };
   } else {
     btn.style.display = 'none';
   }
@@ -1074,9 +1091,11 @@ let ekpEvents = null;
 let ekpLoading = false;
 const ekpFilter = { status: new Set(), weapon: new Set() };
 let ekpCompact = true;
+let ekpHidePast = false;
 
 const EKP_STATUSES = ['МРС','ВС','МЕЖД'];
 const EKP_WEAPONS = ['Пистолет','Револьвер','Карабин','КПК','Ружьё','Троеборье','Пневматика','IDPA'];
+const EKP_WEAPON_TO_APP = { 'Пистолет':'pistol','Револьвер':'revolver','Карабин':'rifle','КПК':'rifle','Ружьё':'rifle','Троеборье':'rifle','Пневматика':'pneumatic','IDPA':'pistol' };
 
 async function ensureEkpLoaded(){
   if(ekpEvents || ekpLoading) { renderEkpChips(); renderEkpList(); return; }
@@ -1105,6 +1124,7 @@ function renderEkpChips(){
   weaponEl.innerHTML = EKP_WEAPONS.map(w=>
     `<button class="chip${ekpFilter.weapon.has(w)?' active':''}" data-ekp-weapon="${w}">${w}</button>`
   ).join('');
+  document.getElementById('ekpHidePastToggle').classList.toggle('active-toggle', ekpHidePast);
 }
 document.getElementById('ekpStatusChips').addEventListener('click', (e)=>{
   const b = e.target.closest('[data-ekp-status]'); if(!b) return;
@@ -1118,12 +1138,29 @@ document.getElementById('ekpWeaponChips').addEventListener('click', (e)=>{
   ekpFilter.weapon.has(v) ? ekpFilter.weapon.delete(v) : ekpFilter.weapon.add(v);
   renderEkpChips(); renderEkpList();
 });
-document.getElementById('ekpStatusInfoBtn').addEventListener('click', ()=>openExplain('comp_info'));
+document.getElementById('ekpStatusInfoBtn').addEventListener('click', ()=>openExplain('ekp_info'));
+document.getElementById('ekpHidePastToggle').addEventListener('click', ()=>{
+  ekpHidePast = !ekpHidePast;
+  renderEkpChips();
+  renderEkpList();
+});
+
+// при переключении полный/сокращённый вид запоминаем, какое событие сейчас видно первым
+// под прилипшими шапками, и после перерисовки прокручиваем обратно к нему
 document.getElementById('ekpViewToggle').addEventListener('click', ()=>{
+  const stickyBottom = document.querySelector('.ekp-sticky-row').getBoundingClientRect().bottom;
+  let anchorId = null;
+  document.querySelectorAll('#ekpList [data-ekp-id]').forEach(el=>{
+    if(anchorId===null && el.getBoundingClientRect().bottom > stickyBottom) anchorId = el.dataset.ekpId;
+  });
   ekpCompact = !ekpCompact;
   document.querySelector('#ekpViewToggle .tgl-compact').style.display = ekpCompact ? '' : 'none';
   document.querySelector('#ekpViewToggle .tgl-full').style.display = ekpCompact ? 'none' : '';
   renderEkpList();
+  if(anchorId){
+    const el = document.querySelector(`#ekpList [data-ekp-id="${anchorId}"]`);
+    if(el) el.scrollIntoView({block:'start'});
+  }
 });
 
 function ekpDayState(ev){
@@ -1143,6 +1180,7 @@ function renderEkpList(){
   let list = ekpEvents;
   if(ekpFilter.status.size) list = list.filter(ev=>ekpFilter.status.has(ev.status));
   if(ekpFilter.weapon.size) list = list.filter(ev=>ev.weapons.some(w=>ekpFilter.weapon.has(w)));
+  if(ekpHidePast) list = list.filter(ev=>ekpDayState(ev)!=='past');
   list = list.slice().sort((a,b)=> new Date(a.start) - new Date(b.start));
 
   const el = document.getElementById('ekpList');
@@ -1152,9 +1190,8 @@ function renderEkpList(){
     el.innerHTML = list.map(ev=>{
       const st = ekpDayState(ev);
       return `<div class="ekp-row state-${st}" data-ekp-id="${ev.id}">
-        <span class="d">${ekpDateLabel(ev.start)}</span>
+        <div class="line1"><span class="d">${ekpDateLabel(ev.start)}</span><span class="p">${ev.place}</span></div>
         <span class="n">${ev.name_short}</span>
-        <span class="p">${ev.place}</span>
       </div>`;
     }).join('');
   } else {
@@ -1162,7 +1199,7 @@ function renderEkpList(){
       const st = ekpDayState(ev);
       const liveTag = st==='live' ? ' · идёт' : '';
       return `<div class="ekp-card state-${st}" data-ekp-id="${ev.id}">
-        <div class="row1"><span>${ekpDateLabel(ev.start)}–${ekpDateLabel(ev.end)}${liveTag}</span><span>${ev.status}</span></div>
+        <div class="row1"><span>${ekpDateLabel(ev.start)} – ${ekpDateLabel(ev.end)}${liveTag}</span><span>${ev.status}</span></div>
         <div class="name">${ev.name}</div>
         <div class="meta">${ev.place_full}</div>
         <div class="meta">${ev.weapons.join(', ')}</div>
@@ -1171,13 +1208,21 @@ function renderEkpList(){
     }).join('');
   }
 }
-document.getElementById('ekpList').addEventListener('click', (e)=>{
+document.getElementById('ekpList').addEventListener('click', async (e)=>{
   const row = e.target.closest('[data-ekp-id]'); if(!row) return;
   const ev = ekpEvents.find(x=>String(x.id)===row.dataset.ekpId); if(!ev) return;
-  // переход в "Требования" с подставленным статусом — оружие/возраст/цель пользователь выбирает сам
+  // переход в "Требования" с подставленным статусом И оружием (первое из списка события)
   const STATUS_TO_COMP_GROUP = { 'МЕЖД':'international', 'ВС':'allrussian', 'МРС':'interregional' };
   const targetGroup = STATUS_TO_COMP_GROUP[ev.status];
+  const appWeapon = EKP_WEAPON_TO_APP[ev.weapons[0]] || state.weapon;
+
   switchTab('req');
+  state.weapon = appWeapon;
+  weaponSelectLabel.textContent = WEAPONS.find(w=>w.id===appWeapon).label;
+  recomputeWeaponAvailability();
+  saveParams();
+  await loadAndRender(); // подгружает данные под новое оружие и уже вызывает recomputeCategoryAndRender -> populateCompetitions -> render
+
   const list = currentPrograms();
   const match = list.find(c=>c.group===targetGroup);
   if(match){
