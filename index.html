@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v39 -->
+<!-- Настрелял на Мастера? — версия v40 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -337,7 +337,7 @@
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
       <p>— Для соревнований со статусом «Другие всероссийские соревнования» нормативка допускает выполнение требований в огнестрельных дисциплинах возрастной категорией юноши/девушки (11–15 лет), но не предусматривает такой возможности для юниоров/юниорок (16–20 лет). Хотя требования к младшим возрастным категориям обычно не мягче, чем к старшим.</p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v39</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v40</p>
       <div style="border-top:1px solid var(--line); margin-top:14px; padding-top:14px;">
         <span class="field-label" style="margin-bottom:10px;">Документы офлайн</span>
         <div class="btn-row" style="flex-direction:column; gap:6px;">
@@ -499,7 +499,7 @@ try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expa
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
 const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
-const APP_VERSION = "v39";
+const APP_VERSION = "v40";
 
 async function relay(action, extra){
   const resp = await fetch(RELAY_URL, {
@@ -1390,24 +1390,24 @@ document.querySelectorAll('.doc-open-btn').forEach(btn=>{
   btn.addEventListener('click', async ()=>{
     const url = btn.dataset.docUrl;
     const originalText = btn.textContent;
-    // Открываем окно СРАЗУ, синхронно по клику — браузер разрешает window.open только
-    // в момент прямого пользовательского действия. Если открыть его ПОСЛЕ await fetch(),
-    // разрешение уже утеряно и браузер молча блокирует открытие без всякой ошибки —
-    // именно это и происходило раньше.
-    const newWin = window.open('', '_blank');
-    if(!newWin){
-      alert('Браузер заблокировал открытие окна. Проверьте настройки блокировки всплывающих окон.');
-      return;
-    }
     btn.textContent = 'Открываю...';
     try{
       const resp = await fetch(url);
       if(!resp.ok) throw new Error('HTTP ' + resp.status);
       const blob = await resp.blob();
       const blobUrl = URL.createObjectURL(blob);
-      newWin.location.href = blobUrl;
+      const filename = url.split('/').pop();
+      // window.open(blobUrl) ненадёжен в WebKit (движок встроенного браузера Telegram на iOS) —
+      // там навигация нового окна на blob-адрес часто молча не срабатывает. Программный клик
+      // по <a download> работает надёжнее кроссплатформенно и не уводит со страницы мини-эппа.
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(blobUrl), 30000);
     }catch(e){
-      newWin.close();
       alert('Не получилось открыть документ. Проверьте соединение и попробуйте ещё раз.');
     }finally{
       btn.textContent = originalText;
