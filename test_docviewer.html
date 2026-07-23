@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Тест открытия документов</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#14161a; --panel:#1c1f24; --panel-2:#21252b; --line:#2c3138;
+    --text:#eef0ee; --text-dim:#9aa3ad; --brass:#c9924f; --warn:#e2542c;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:16px; }
+  h1{ font-size:1.1rem; margin:0 0 4px; }
+  .sub{ color:var(--text-dim); font-size:0.85rem; margin:0 0 20px; }
+  .file-picker{ display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
+  .file-picker label{ font-size:0.8rem; color:var(--text-dim); }
+  .file-picker input{ background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    padding:8px 10px; border-radius:8px; font-size:0.85rem; font-family:inherit; }
+  .row{ display:flex; gap:10px; margin-bottom:24px; }
+  button.opt{ flex:1; appearance:none; border:1px solid var(--line); background:var(--panel);
+    color:var(--text); padding:14px 10px; border-radius:12px; font-size:0.9rem; font-weight:700;
+    cursor:pointer; font-family:inherit; }
+  button.opt:active{ background:var(--panel-2); }
+  button.opt .tag{ display:block; font-size:0.7rem; font-weight:400; color:var(--text-dim); margin-top:4px; }
+  #log{ background:var(--panel); border-radius:10px; padding:10px 12px; font-size:0.78rem;
+    color:var(--text-dim); white-space:pre-wrap; margin-bottom:20px; max-height:140px; overflow:auto; }
+  #viewer{ border:1px solid var(--line); border-radius:10px; min-height:60px; padding:10px; }
+  #viewer canvas{ width:100%; display:block; margin-bottom:10px; border-radius:6px; }
+  table{ width:100%; border-collapse:collapse; font-size:0.78rem; }
+  th,td{ border:1px solid var(--line); padding:4px 6px; text-align:left; }
+  th{ background:var(--panel-2); color:var(--brass); }
+  .warn{ color:var(--warn); }
+  .ok{ color:#5fb37c; }
+</style>
+</head>
+<body>
+
+<h1>Тест: как открывать документы в Mini App</h1>
+<p class="sub">Две кнопки — два способа. Смотрим, у какого не вылезает диалог «Open URL? No/Yes» и не уходит во внешний браузер.</p>
+
+<div class="file-picker">
+  <label>URL PDF-файла (для теста варианта А и Б-PDF):</label>
+  <input type="text" id="pdfUrl" value="https://ramzesikus.github.io/MasterFlomaster/docs/polozhenie-evsk.pdf">
+  <label>URL XLSX-файла (для теста варианта Б-XLSX):</label>
+  <input type="text" id="xlsxUrl" value="https://ramzesikus.github.io/MasterFlomaster/docs/normy-trebovania-uslovia.xlsx">
+</div>
+
+<div class="row">
+  <button class="opt" id="btnBlob">Вариант А — Blob
+    <span class="tag">fetch() → blob-URL → open</span>
+  </button>
+  <button class="opt" id="btnEmbed">Вариант Б — Встроенный просмотр
+    <span class="tag">pdf.js / SheetJS, рисуем сами</span>
+  </button>
+</div>
+
+<div id="log">Лог событий появится здесь.</div>
+<div id="viewer"></div>
+
+<script>
+const tg = window.Telegram && window.Telegram.WebApp;
+if(tg){ tg.ready(); tg.expand(); }
+
+const logEl = document.getElementById('log');
+function log(msg){
+  const t = new Date().toLocaleTimeString();
+  logEl.textContent += `\n[${t}] ${msg}`;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+log('Готово. Жми любую из кнопок выше.');
+
+/* ================= ВАРИАНТ А — BLOB ================= */
+document.getElementById('btnBlob').addEventListener('click', async ()=>{
+  const url = document.getElementById('pdfUrl').value;
+  log('Вариант А: качаю файл через fetch()...');
+  try{
+    const resp = await fetch(url);
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const blob = await resp.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    log('Файл скачан (' + Math.round(blob.size/1024) + ' КБ). Пробую открыть blob-URL...');
+    // Пробуем два способа открытия blob — сравните, какой реально сработает без диалога
+    window.open(blobUrl, '_blank');
+    log('window.open(blobUrl) вызван. Если это не сработало — раскомментируй location.href в коде и попробуй ещё раз.');
+    // location.href = blobUrl;
+  }catch(e){
+    log('ОШИБКА: ' + e.message);
+  }
+});
+
+/* ================= ВАРИАНТ Б — ВСТРОЕННЫЙ ПРОСМОТР ================= */
+document.getElementById('btnEmbed').addEventListener('click', async ()=>{
+  const viewer = document.getElementById('viewer');
+  viewer.innerHTML = '';
+  const pdfUrl = document.getElementById('pdfUrl').value;
+  const xlsxUrl = document.getElementById('xlsxUrl').value;
+
+  // сначала пробуем как PDF
+  if(pdfUrl){
+    log('Вариант Б: качаю и рендерю PDF через pdf.js...');
+    try{
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const resp = await fetch(pdfUrl);
+      const buf = await resp.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+      log('PDF загружен, страниц: ' + pdf.numPages + '. Рисую первые 3...');
+      const pagesToRender = Math.min(3, pdf.numPages);
+      for(let i=1; i<=pagesToRender; i++){
+        const page = await pdf.getPage(i);
+        const scale = 1.2;
+        const viewport = page.getViewport({scale});
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        viewer.appendChild(canvas);
+        await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+      }
+      log('PDF отрисован (первые ' + pagesToRender + ' стр. из ' + pdf.numPages + ').');
+    }catch(e){
+      log('Ошибка рендера PDF: ' + e.message);
+    }
+  }
+
+  // и таблицей — xlsx
+  if(xlsxUrl){
+    log('Вариант Б: качаю и рендерю XLSX через SheetJS...');
+    try{
+      const resp = await fetch(xlsxUrl);
+      const buf = await resp.arrayBuffer();
+      const wb = XLSX.read(buf, {type:'array'});
+      const sheetName = wb.SheetNames[0];
+      const html = XLSX.utils.sheet_to_html(wb.Sheets[sheetName], {editable:false});
+      const wrap = document.createElement('div');
+      wrap.style.overflowX = 'auto';
+      wrap.innerHTML = html;
+      viewer.appendChild(wrap);
+      log('XLSX отрисован (лист «' + sheetName + '»).');
+    }catch(e){
+      log('Ошибка рендера XLSX: ' + e.message);
+    }
+  }
+});
+</script>
+</body>
+</html>
