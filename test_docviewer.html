@@ -86,7 +86,7 @@ document.getElementById('btnBlob').addEventListener('click', async ()=>{
     // Пробуем два способа открытия blob — сравните, какой реально сработает без диалога
     window.open(blobUrl, '_blank');
     log('window.open(blobUrl) вызван. Если это не сработало — раскомментируй location.href в коде и попробуй ещё раз.');
-    // location.href = blobUrl;
+    location.href = blobUrl;
   }catch(e){
     log('ОШИБКА: ' + e.message);
   }
