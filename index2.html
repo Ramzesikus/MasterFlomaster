@@ -1186,9 +1186,9 @@ function updateGotoEkpBtn(comp){
       ekpFilter.status = new Set([GROUP_TO_EKP_STATUS[comp.group]]);
       ekpFilter.weapon = new Set(APP_WEAPON_TO_EKP[state.weapon] || []);
       ekpFilter.ctype = COMP_ID_TO_EKP_CTYPE[comp.id] || EKP_NO_MATCH;
-      ekpHidePast = true;
+      ekpHidePast = false;
       switchTab('ekp');
-      ensureEkpLoaded().then(()=>{ renderEkpChips(); renderEkpList(); scrollEkpListToTop(); });
+      ensureEkpLoaded().then(()=>{ renderEkpChips(); renderEkpList(); scrollEkpListToFirstUpcoming(); });
     };
   } else {
     btn.style.display = 'none';
@@ -1227,13 +1227,25 @@ async function ensureEkpLoaded(){
   layoutFixedBars();
 }
 
-function scrollEkpListToTop(){
+function scrollEkpListToFirstUpcoming(){
   // двойной requestAnimationFrame гарантирует, что браузер уже пересчитал раскладку
-  // после рендера списка и подгонки отступов под фиксированные панели — иначе scrollTo
-  // может выполниться до того, как высоты стабилизируются, и промахнуться мимо цели
+  // после рендера списка и подгонки отступов под фиксированные панели — иначе расчёт
+  // позиции может промахнуться мимо цели, пока высоты ещё не стабилизировались
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
-      window.scrollTo(0,0);
+      const rows = document.querySelectorAll('#ekpList [data-ekp-id]');
+      let target = null;
+      for(const el of rows){
+        if(!el.classList.contains('state-past')){ target = el; break; }
+      }
+      if(!target){ window.scrollTo(0,0); return; }
+      const headerH = document.getElementById('fixedHeader').offsetHeight;
+      const ekpRow = document.getElementById('fixedEkpRow');
+      const ekpRowH = ekpRow.style.display !== 'none' ? ekpRow.offsetHeight : 0;
+      // offsetTop у первого элемента списка уже включает весь верхний паддинг mainWrap
+      // (headerH + ekpRowH + 16) — вычитаем только headerH+ekpRowH, чтобы остался
+      // тот же самый 16px зазор сверху, что и в обычном виде списка без прокрутки
+      window.scrollTo(0, target.offsetTop - headerH - ekpRowH);
     });
   });
 }
