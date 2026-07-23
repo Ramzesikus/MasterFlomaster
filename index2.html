@@ -906,7 +906,7 @@ const ALL_STATUSES = [
   {id:'subject_cup', label:'Финал Кубка субъекта (кроме Москвы и СПб)', group:'regional'},
   {id:'subject_junior', label:'Первенство субъекта РФ', group:'regional'},
   {id:'subject_other', label:'Другие соревнования субъекта РФ', group:'regional'},
-  {id:'fizkult', label:'Физкультурные мероприятия субъекта РФ', group:'regional'},
+  {id:'fizkult', label:'Физкультурные мероприятия субъекта РФ', group:'municipal'},
   {id:'municipal_champ', label:'Чемпионат муниципального образования', group:'municipal'},
   {id:'municipal_junior', label:'Первенство муниципального образования', group:'municipal'},
   {id:'municipal_other', label:'Другие соревнования муниципального образования', group:'municipal'},
@@ -1207,7 +1207,6 @@ let ekpHidePast = false;
 
 const EKP_STATUSES = ['МРС','ВС','МЕЖД'];
 const EKP_WEAPONS = ['Пистолет','Револьвер','Карабин','КПК','Ружьё','Троеборье','Пневматика','IDPA'];
-const EKP_WEAPON_TO_APP = { 'Пистолет':'pistol','Револьвер':'revolver','Карабин':'rifle','КПК':'rifle','Ружьё':'rifle','Троеборье':'rifle','Пневматика':'pneumatic','IDPA':'pistol' };
 
 async function ensureEkpLoaded(){
   if(ekpEvents || ekpLoading) { renderEkpChips(); renderEkpList(); return; }
@@ -1229,7 +1228,14 @@ async function ensureEkpLoaded(){
 }
 
 function scrollEkpListToTop(){
-  window.scrollTo(0,0);
+  // двойной requestAnimationFrame гарантирует, что браузер уже пересчитал раскладку
+  // после рендера списка и подгонки отступов под фиксированные панели — иначе scrollTo
+  // может выполниться до того, как высоты стабилизируются, и промахнуться мимо цели
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      window.scrollTo(0,0);
+    });
+  });
 }
 
 function renderEkpChips(){
@@ -1296,6 +1302,24 @@ function ekpDateLabel(iso){
   const d = new Date(iso);
   return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
+const ekpExpandedIds = new Set();
+
+function renderEkpCompactRow(ev, st){
+  return `<div class="ekp-row state-${st}" data-ekp-id="${ev.id}">
+    <div class="line1"><span class="d">${ekpDateLabel(ev.start)}</span><span class="p">${ev.place}</span></div>
+    <span class="n">${ev.name_short}</span>
+  </div>`;
+}
+function renderEkpFullCard(ev, st){
+  const liveTag = st==='live' ? ' · идёт' : '';
+  return `<div class="ekp-card state-${st}" data-ekp-id="${ev.id}">
+    <div class="row1"><span>${ekpDateLabel(ev.start)} – ${ekpDateLabel(ev.end)}${liveTag}</span><span>${ev.status}</span></div>
+    <div class="name">${ev.name}</div>
+    <div class="meta">${ev.place_full}</div>
+    <div class="meta">${ev.weapons.join(', ')}</div>
+    <div class="meta">${ev.ages.join(', ')}</div>
+  </div>`;
+}
 function renderEkpList(){
   if(!ekpEvents) return;
   let list = ekpEvents;
@@ -1308,56 +1332,21 @@ function renderEkpList(){
   const el = document.getElementById('ekpList');
   if(list.length===0){ el.innerHTML = `<div class="field-note">Нет матчей под выбранные фильтры.</div>`; return; }
 
-  if(ekpCompact){
-    el.innerHTML = list.map(ev=>{
-      const st = ekpDayState(ev);
-      return `<div class="ekp-row state-${st}" data-ekp-id="${ev.id}">
-        <div class="line1"><span class="d">${ekpDateLabel(ev.start)}</span><span class="p">${ev.place}</span></div>
-        <span class="n">${ev.name_short}</span>
-      </div>`;
-    }).join('');
-  } else {
-    el.innerHTML = list.map(ev=>{
-      const st = ekpDayState(ev);
-      const liveTag = st==='live' ? ' · идёт' : '';
-      return `<div class="ekp-card state-${st}" data-ekp-id="${ev.id}">
-        <div class="row1"><span>${ekpDateLabel(ev.start)} – ${ekpDateLabel(ev.end)}${liveTag}</span><span>${ev.status}</span></div>
-        <div class="name">${ev.name}</div>
-        <div class="meta">${ev.place_full}</div>
-        <div class="meta">${ev.weapons.join(', ')}</div>
-        <div class="meta">${ev.ages.join(', ')}</div>
-      </div>`;
-    }).join('');
-  }
+  el.innerHTML = list.map(ev=>{
+    const st = ekpDayState(ev);
+    const showFull = !ekpCompact || ekpExpandedIds.has(String(ev.id));
+    return showFull ? renderEkpFullCard(ev, st) : renderEkpCompactRow(ev, st);
+  }).join('');
 }
-document.getElementById('ekpList').addEventListener('click', async (e)=>{
+// Тап по конкретному матчу больше никуда не переключает вкладку — он просто разворачивает
+// именно эту карточку в полный вид (если общий режим списка сейчас "сокращённый"), повторный
+// тап сворачивает обратно. Если общий режим и так "полный" — тап ни на что не влияет.
+document.getElementById('ekpList').addEventListener('click', (e)=>{
   const row = e.target.closest('[data-ekp-id]'); if(!row) return;
-  const ev = ekpEvents.find(x=>String(x.id)===row.dataset.ekpId); if(!ev) return;
-  // переход в "Требования" с подставленным статусом И оружием (первое из списка события)
-  const STATUS_TO_COMP_GROUP = { 'МЕЖД':'international', 'ВС':'allrussian', 'МРС':'interregional' };
-  const targetGroup = STATUS_TO_COMP_GROUP[ev.status];
-  const appWeapon = EKP_WEAPON_TO_APP[ev.weapons[0]] || state.weapon;
-
-  switchTab('req');
-  state.weapon = appWeapon;
-  weaponSelectLabel.textContent = WEAPONS.find(w=>w.id===appWeapon).label;
-  recomputeWeaponAvailability();
-  // сбрасываем прежний выбор статуса ДО пересчёта — иначе он может случайно совпасть по id
-  // с чем-то валидным для нового оружия и остаться незамеченным как "нерелевантный, но рабочий"
-  state.comp = null; state.compLabel = null;
-  saveParams();
-  await loadAndRender(); // подгружает данные под новое оружие и уже вызывает recomputeCategoryAndRender -> populateCompetitions -> render
-
-  const list = currentPrograms();
-  const match = list.find(c=>c.group===targetGroup && COMP_ID_TO_EKP_CTYPE[c.id]===ev.ctype)
-             || list.find(c=>c.group===targetGroup);
-  if(match){
-    state.comp = match.id; state.compLabel = match.label;
-    document.getElementById('compUnavailableNote').style.display = 'none';
-    compSelectBtn.classList.remove('invalid');
-    compSelectLabel.textContent = match.label;
-    render();
-  }
+  if(!ekpCompact) return;
+  const id = row.dataset.ekpId;
+  ekpExpandedIds.has(id) ? ekpExpandedIds.delete(id) : ekpExpandedIds.add(id);
+  renderEkpList();
 });
 
 /* ============ СПИННЕР ЗАГРУЗКИ ============ */
