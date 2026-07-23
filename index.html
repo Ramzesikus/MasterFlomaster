@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v41 -->
+<!-- Настрелял на Мастера? — версия v42 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -333,7 +333,7 @@
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
       <p>— Для соревнований со статусом «Другие всероссийские соревнования» нормативка допускает выполнение требований в огнестрельных дисциплинах возрастной категорией юноши/девушки (11–15 лет), но не предусматривает такой возможности для юниоров/юниорок (16–20 лет). Хотя требования к младшим возрастным категориям обычно не мягче, чем к старшим.</p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v41</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v42</p>
       <div style="border-top:1px solid var(--line); margin-top:14px; padding-top:14px;">
         <span class="field-label" style="margin-bottom:10px;">Документы</span>
         <div class="btn-row" style="flex-direction:column; gap:6px;">
@@ -490,7 +490,7 @@ try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expa
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
 const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
-const APP_VERSION = "v41";
+const APP_VERSION = "v42";
 
 async function relay(action, extra){
   const resp = await fetch(RELAY_URL, {
@@ -719,7 +719,10 @@ const state = { sex:'m', age:18, weapon:'pistol', target:'r1', category:null, fo
    Пробуем Telegram CloudStorage (переживает переустановку, синхронизируется между устройствами
    в рамках одного бота), при недоступности — обычный localStorage как резерв. */
 function saveParams(){
-  const payload = JSON.stringify({ sex:state.sex, age:state.age, weapon:state.weapon });
+  const payload = JSON.stringify({
+    sex:state.sex, age:state.age, weapon:state.weapon, target:state.target,
+    comp:state.comp, compLabel:state.compLabel, format:state.format,
+  });
   try{
     if(tg && tg.CloudStorage && tg.CloudStorage.setItem){
       tg.CloudStorage.setItem('saved_params', payload, ()=>{});
@@ -750,6 +753,12 @@ function applySavedParams(saved){
   if(saved.sex==='m' || saved.sex==='f') state.sex = saved.sex;
   if(typeof saved.age==='number' && saved.age>=10 && saved.age<=21) state.age = saved.age;
   if(WEAPONS.find(w=>w.id===saved.weapon)) state.weapon = saved.weapon;
+  if(TARGET_LABEL[saved.target]) state.target = saved.target;
+  if(saved.format==='personal' || saved.format==='team') state.format = saved.format;
+  // Статус соревнования восстанавливаем "как есть", без проверки — если он окажется
+  // недоступен для восстановленных оружия/возраста/цели, это корректно обработает уже
+  // существующая логика populateCompetitions() (затенение + подпись "недоступно").
+  if(saved.comp){ state.comp = saved.comp; state.compLabel = saved.compLabel || null; }
 }
 
 function setActive(group, value){
@@ -833,6 +842,7 @@ document.getElementById('targetOptionsList').addEventListener('click', async (e)
   const b = e.target.closest('.opt-btn[data-target-id]'); if(!b || b.classList.contains('disabled')) return;
   state.target = b.dataset.targetId; targetSelectLabel.textContent = TARGET_LABEL[state.target];
   closeModal('targetModal');
+  saveParams();
   await loadAndRender();
 });
 targetSelectLabel.textContent = TARGET_LABEL[state.target];
@@ -950,6 +960,11 @@ const compSelectLabel = document.getElementById('compSelectLabel');
 compSelectBtn.addEventListener('click', ()=>{
   renderCompOptions();
   openModal('compModal');
+  const body = document.querySelector('#compModal .modal-body');
+  if(body){
+    body.scrollTop = 0;
+    requestAnimationFrame(()=>{ body.scrollTop = 0; });
+  }
 });
 document.getElementById('compOptionsList').addEventListener('click', (e)=>{
   const b = e.target.closest('.opt-btn[data-comp-id]'); if(!b) return;
@@ -958,6 +973,7 @@ document.getElementById('compOptionsList').addEventListener('click', (e)=>{
   state.comp = s.id; state.compLabel = s.label; compSelectLabel.textContent = s.label;
   document.getElementById('compUnavailableNote').style.display = 'none';
   compSelectBtn.classList.remove('invalid');
+  saveParams();
   closeModal('compModal'); render();
 });
 function currentPrograms(){ return effectivePrograms(state.weapon, state.category, state.target); }
@@ -995,7 +1011,7 @@ function found_placeholder(){ return 'Статус не выбран'; }
 /* ---- формат участия (в результатах) ---- */
 document.getElementById('resultZone').addEventListener('click', (e)=>{
   const fBtn = e.target.closest('.opt-btn[data-group="format"]');
-  if(fBtn && !fBtn.classList.contains('disabled')){ state.format = fBtn.dataset.value; render(); return; }
+  if(fBtn && !fBtn.classList.contains('disabled')){ state.format = fBtn.dataset.value; saveParams(); render(); return; }
   const qBtn = e.target.closest('.q-btn');
   if(qBtn){
     const source = qBtn.dataset.explainSource || 'explain';
@@ -1425,6 +1441,7 @@ async function boot(){
   ageSlider.value = state.age;
   updateAgeLabel();
   weaponSelectLabel.textContent = WEAPONS.find(w=>w.id===state.weapon).label;
+  targetSelectLabel.textContent = TARGET_LABEL[state.target];
   try{
     await ensureLoaded(state.weapon, state.target);
   }catch(e){
