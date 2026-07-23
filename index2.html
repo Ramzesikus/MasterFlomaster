@@ -52,6 +52,10 @@
     background:var(--panel-2) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%239aa3ad" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 14px center;
     border-color:var(--line); color:var(--text-dim); font-weight:500;
   }
+  .hide-inactive-btn{ appearance:none; border:1px solid var(--line); background:var(--panel-2); color:var(--text-dim);
+    font-size:0.72rem; padding:5px 10px; border-radius:10px; cursor:pointer; font-family:inherit; flex:none; white-space:nowrap; }
+  .hide-inactive-btn.active{ background:var(--brass); border-color:var(--brass); color:#191410; font-weight:700; }
+  #compOptionsList .opt-btn.opt-inactive{ opacity:0.4; cursor:default; }
   #compOptionsList .opt-btn, #targetOptionsList .opt-btn, #weaponOptionsList .opt-btn{ width:100%; text-align:left; }
   .group-sep{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--brass);
     text-align:center; margin:14px 0 6px; font-weight:700; }
@@ -130,7 +134,7 @@
      когда нужна стопроцентная неподвижность с самого начала. Высоту меряем в JS и
      проставляем как отступ контенту — жёстко прописанные пиксели ненадёжны на разных
      телефонах/шрифтах. ===== */
-  .fixed-header{ position:fixed; bottom:0; left:0; right:0; background:var(--bg); z-index:30; border-top:1px solid var(--line); }
+  .fixed-header{ position:fixed; top:0; left:0; right:0; background:var(--bg); z-index:30; border-bottom:1px solid var(--line); }
   .tab-bar-row{ display:flex; align-items:center; justify-content:space-between;
     max-width:560px; margin:0 auto; padding:10px 16px 10px; }
   .tab-bar{ display:flex; gap:18px; }
@@ -138,7 +142,7 @@
     font-size:0.92rem; font-weight:700; padding:9px 2px 10px; cursor:pointer; font-family:inherit; margin-bottom:-1px; }
   .tab-btn.active{ color:var(--brass); border-bottom-color:var(--brass); }
   .tab-bar-row .head-icons{ margin-left:0; }
-  .fixed-ekp-row{ position:fixed; left:0; right:0; background:var(--bg); z-index:29; border-top:1px solid var(--line); }
+  .fixed-ekp-row{ position:fixed; left:0; right:0; background:var(--bg); z-index:29; border-bottom:1px solid var(--line); }
   .fixed-ekp-row .ekp-toprow{ max-width:560px; margin:0 auto; padding:10px 16px 12px; }
 
   /* ===== ССЫЛКА НА ЕКП ИЗ ТРЕБОВАНИЙ ===== */
@@ -164,8 +168,10 @@
 
   .ekp-row{ display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:10px;
     background:var(--panel); margin-bottom:6px; }
-  .ekp-row.state-past{ opacity:0.45; }
+  .ekp-row.state-past{ opacity:0.4; }
+  .ekp-row.state-past .d, .ekp-row.state-past .n{ font-style:italic; }
   .ekp-row.state-live{ background:var(--panel-2); border-left:3px solid var(--brass); }
+  .ekp-row.state-future .d{ color:var(--text); }
   .ekp-row .line1{ display:flex; justify-content:space-between; gap:10px; }
   .ekp-row .d{ font-size:0.76rem; color:var(--text-dim); white-space:nowrap; flex:none; }
   .ekp-row.state-live .d{ color:var(--brass); font-weight:700; }
@@ -174,8 +180,10 @@
   .ekp-row.state-live .n{ font-weight:700; }
 
   .ekp-card{ padding:12px 14px; border-radius:12px; background:var(--panel); margin-bottom:8px; }
-  .ekp-card.state-past{ opacity:0.45; }
+  .ekp-card.state-past{ opacity:0.4; }
+  .ekp-card.state-past .name, .ekp-card.state-past .row1{ font-style:italic; }
   .ekp-card.state-live{ background:var(--panel-2); border-left:3px solid var(--brass); }
+  .ekp-card.state-future .row1{ color:var(--text); }
   .ekp-card .row1{ display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.76rem; color:var(--text-dim); }
   .ekp-card.state-live .row1{ color:var(--brass); font-weight:700; }
   .ekp-card .name{ font-size:0.9rem; color:var(--text); margin-bottom:4px; }
@@ -396,7 +404,10 @@
 <div class="modal-overlay" id="compModal">
   <div class="modal-card">
     <button class="modal-close" data-close="compModal">×</button>
-    <h3 class="modal-title">На соревновании</h3>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin:0 30px 12px 0;">
+      <h3 class="modal-title" style="margin:0;">На соревновании</h3>
+      <button class="hide-inactive-btn" id="compHideInactiveBtn" type="button">Скрыть неактивные</button>
+    </div>
     <div class="modal-body"><div class="btn-row" id="compOptionsList" style="flex-direction:column;"></div></div>
   </div>
 </div>
@@ -577,9 +588,9 @@ function layoutFixedBars(){
   const headerH = document.getElementById('fixedHeader').offsetHeight;
   const ekpRow = document.getElementById('fixedEkpRow');
   const ekpRowVisible = ekpRow.style.display !== 'none';
-  ekpRow.style.bottom = headerH + 'px'; // ставим строку "Матчи:" стопкой прямо над нижней навигацией
+  ekpRow.style.top = headerH + 'px';
   const ekpRowH = ekpRowVisible ? ekpRow.offsetHeight : 0;
-  document.getElementById('mainWrap').style.paddingBottom = (headerH + ekpRowH + 16) + 'px';
+  document.getElementById('mainWrap').style.paddingTop = (headerH + ekpRowH + 16) + 'px';
 }
 window.addEventListener('resize', layoutFixedBars);
 // ResizeObserver отслеживает сами фиксированные бары и пересчитывает отступы при ЛЮБОМ
@@ -873,24 +884,67 @@ async function loadAndRender(){
   recomputeCategoryAndRender();
 }
 
+// Полный перечень статусов соревнований во всей ЕВСК — не зависит от текущего оружия/возраста/цели
+// (это структура классификации сама по себе, а не производная от конкретной комбинации параметров).
+// Доступность конкретного статуса для ТЕКУЩЕЙ комбинации проверяется отдельно, через currentPrograms().
+const ALL_STATUSES = [
+  {id:'world_champ', label:'Чемпионат мира', group:'international'},
+  {id:'europe_champ', label:'Чемпионат Европы', group:'international'},
+  {id:'world_junior', label:'Первенство мира', group:'international'},
+  {id:'europe_junior', label:'Первенство Европы', group:'international'},
+  {id:'intl_other', label:'Другое международное соревнование (ЕКП)', group:'international'},
+  {id:'russia_champ', label:'Чемпионат России (ЧР)', group:'allrussian'},
+  {id:'russia_cup', label:'Финал Кубка России (ФКР)', group:'allrussian'},
+  {id:'russia_junior', label:'Первенство России', group:'allrussian'},
+  {id:'allru_other', label:'Всероссийское соревнование (кроме ЧР и ФКР)', group:'allrussian'},
+  {id:'fo_champ', label:'Чемпионат федерального округа', group:'interregional'},
+  {id:'fo_junior', label:'Первенство федерального округа', group:'interregional'},
+  {id:'interregional_other', label:'Другие межрегиональные соревнования', group:'interregional'},
+  {id:'msk_spb_champ', label:'Чемпионат Москвы / Санкт-Петербурга', group:'regional'},
+  {id:'msk_spb_junior', label:'Первенство Москвы / Санкт-Петербурга', group:'regional'},
+  {id:'subject_champ', label:'Чемпионат субъекта РФ (кроме Москвы и СПб)', group:'regional'},
+  {id:'subject_cup', label:'Финал Кубка субъекта (кроме Москвы и СПб)', group:'regional'},
+  {id:'subject_junior', label:'Первенство субъекта РФ', group:'regional'},
+  {id:'subject_other', label:'Другие соревнования субъекта РФ', group:'regional'},
+  {id:'fizkult', label:'Физкультурные мероприятия субъекта РФ', group:'regional'},
+  {id:'municipal_champ', label:'Чемпионат муниципального образования', group:'municipal'},
+  {id:'municipal_junior', label:'Первенство муниципального образования', group:'municipal'},
+  {id:'municipal_other', label:'Другие соревнования муниципального образования', group:'municipal'},
+];
+let compHideInactive = false;
+function renderCompOptions(){
+  const list = currentPrograms();
+  const availableIds = new Set(list.map(c=>c.id));
+  const opts = document.getElementById('compOptionsList');
+  let html = ''; let lastGroup = null;
+  ALL_STATUSES.forEach(s=>{
+    const isAvailable = availableIds.has(s.id);
+    if(compHideInactive && !isAvailable) return;
+    if(s.group!==lastGroup){ html += `<div class="group-sep">— ${META.GROUP_LABELS[s.group]} —</div>`; lastGroup=s.group; }
+    const active = s.id===state.comp ? ' active' : '';
+    const inactive = isAvailable ? '' : ' opt-inactive';
+    html += `<button class="opt-btn${active}${inactive}" data-comp-id="${s.id}" data-available="${isAvailable}">${s.label}</button>`;
+  });
+  opts.innerHTML = html || '<div class="field-note">Нет статусов, соответствующих текущему фильтру.</div>';
+}
+document.getElementById('compHideInactiveBtn').addEventListener('click', ()=>{
+  compHideInactive = !compHideInactive;
+  document.getElementById('compHideInactiveBtn').classList.toggle('active', compHideInactive);
+  renderCompOptions();
+});
+
 /* ---- статус соревнования ---- */
 const compSelectBtn = document.getElementById('compSelectBtn');
 const compSelectLabel = document.getElementById('compSelectLabel');
 compSelectBtn.addEventListener('click', ()=>{
-  const list = currentPrograms();
-  const opts = document.getElementById('compOptionsList');
-  let html = ''; let lastGroup = null;
-  list.forEach(c=>{
-    if(c.group!==lastGroup){ html += `<div class="group-sep">— ${META.GROUP_LABELS[c.group]} —</div>`; lastGroup=c.group; }
-    const active = c.id===state.comp ? ' active' : '';
-    html += `<button class="opt-btn${active}" data-comp-id="${c.id}">${c.label}</button>`;
-  });
-  opts.innerHTML = html || '<div class="field-note">Нет доступных соревнований для этой комбинации.</div>';
+  renderCompOptions();
   openModal('compModal');
 });
 document.getElementById('compOptionsList').addEventListener('click', (e)=>{
   const b = e.target.closest('.opt-btn[data-comp-id]'); if(!b) return;
-  state.comp = b.dataset.compId; state.compLabel = b.textContent; compSelectLabel.textContent = b.textContent;
+  if(b.dataset.available !== 'true') return; // неактивный статус — просто ничего не делаем
+  const s = ALL_STATUSES.find(x=>x.id===b.dataset.compId);
+  state.comp = s.id; state.compLabel = s.label; compSelectLabel.textContent = s.label;
   document.getElementById('compUnavailableNote').style.display = 'none';
   compSelectBtn.classList.remove('invalid');
   closeModal('compModal'); render();
@@ -1104,8 +1158,12 @@ const GROUP_TO_EKP_STATUS = { interregional:'МРС', allrussian:'ВС', interna
 const APP_WEAPON_TO_EKP = { pistol:['Пистолет'], revolver:['Револьвер'], rifle:['Карабин','КПК','Ружьё','Троеборье'], pneumatic:['Пневматика'] };
 // Точное сопоставление id статуса из "Требования" с реальным текстом "Тип соревнований" в ЕКП —
 // нужно, чтобы переход между вкладками бил не просто в широкую группу (МРС/ВС/МЕЖД), а в
-// конкретный вид соревнования, если он есть в календаре. У Москвы/СПб и обычных региональных/
-// муниципальных статусов соответствия нет (их вообще нет в ЕКП) — для них просто null.
+// конкретный вид соревнования, если он есть в календаре. "Другие..." (allru_other, intl_other) —
+// это явный "все остальные, КРОМЕ поимённо перечисленных" статус, поэтому Чемпионат мира/Европы
+// сюда НЕ входят — под них в календаре просто нет отдельного типа, и это должно значить
+// "показать ничего", а не "показать более широкую группу". Тот же принцип и для
+// interregional_other — своего типа в ЕКП у него нет.
+const EKP_NO_MATCH = '__NO_EKP_MATCH__';
 const COMP_ID_TO_EKP_CTYPE = {
   russia_champ: 'Чемпионат России',
   russia_cup: 'Финал Кубка России (ФКР)',
@@ -1113,11 +1171,12 @@ const COMP_ID_TO_EKP_CTYPE = {
   fo_champ: 'Чемпионат федерального округа',
   fo_junior: 'Первенство федерального округа',
   russia_junior: 'Первенство России',
-  world_champ: 'Другие международные соревнования',
-  europe_champ: 'Другие международные соревнования',
-  world_junior: 'Другие международные соревнования',
-  europe_junior: 'Другие международные соревнования',
   intl_other: 'Другие международные соревнования',
+  world_champ: EKP_NO_MATCH,
+  europe_champ: EKP_NO_MATCH,
+  world_junior: EKP_NO_MATCH,
+  europe_junior: EKP_NO_MATCH,
+  interregional_other: EKP_NO_MATCH,
 };
 function updateGotoEkpBtn(comp){
   const btn = document.getElementById('gotoEkpBtn');
@@ -1126,9 +1185,10 @@ function updateGotoEkpBtn(comp){
     btn.onclick = ()=>{
       ekpFilter.status = new Set([GROUP_TO_EKP_STATUS[comp.group]]);
       ekpFilter.weapon = new Set(APP_WEAPON_TO_EKP[state.weapon] || []);
-      ekpFilter.ctype = COMP_ID_TO_EKP_CTYPE[comp.id] || null;
+      ekpFilter.ctype = COMP_ID_TO_EKP_CTYPE[comp.id] || EKP_NO_MATCH;
+      ekpHidePast = true;
       switchTab('ekp');
-      ensureEkpLoaded().then(()=>{ renderEkpChips(); renderEkpList(); });
+      ensureEkpLoaded().then(()=>{ renderEkpChips(); renderEkpList(); scrollEkpListToTop(); });
     };
   } else {
     btn.style.display = 'none';
@@ -1166,6 +1226,10 @@ async function ensureEkpLoaded(){
   renderEkpChips();
   renderEkpList();
   layoutFixedBars();
+}
+
+function scrollEkpListToTop(){
+  window.scrollTo(0,0);
 }
 
 function renderEkpChips(){
