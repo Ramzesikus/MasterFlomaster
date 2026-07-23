@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v32 -->
+<!-- Настрелял на Мастера? — версия v36 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -52,6 +52,10 @@
     background:var(--panel-2) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%239aa3ad" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>') no-repeat right 14px center;
     border-color:var(--line); color:var(--text-dim); font-weight:500;
   }
+  .hide-inactive-btn{ appearance:none; border:1px solid var(--line); background:var(--panel-2); color:var(--text-dim);
+    font-size:0.72rem; padding:5px 10px; border-radius:10px; cursor:pointer; font-family:inherit; flex:none; white-space:nowrap; }
+  .hide-inactive-btn.active{ background:var(--brass); border-color:var(--brass); color:#191410; font-weight:700; }
+  #compOptionsList .opt-btn.opt-inactive{ opacity:0.4; cursor:default; }
   #compOptionsList .opt-btn, #targetOptionsList .opt-btn, #weaponOptionsList .opt-btn{ width:100%; text-align:left; }
   .group-sep{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--brass);
     text-align:center; margin:14px 0 6px; font-weight:700; }
@@ -64,7 +68,7 @@
   .age-value{ font-size:1.3rem; font-weight:700; color:var(--brass); margin-bottom:6px; margin-top:10px; white-space:nowrap; }
   .age-value .unit{ font-size:0.95rem; color:var(--text-dim); font-weight:500; margin-left:4px; }
   input[type=range]{ width:90%; -webkit-appearance:none; height:6px; border-radius:3px;
-    background:var(--panel-2); outline:none; margin-top:6px; }
+    background:var(--brass-dim); outline:none; margin-top:6px; }
   input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
     background:var(--brass); cursor:pointer; border:3px solid #191410; }
   input[type=range]::-moz-range-thumb{ width:26px; height:26px; border-radius:50%;
@@ -124,13 +128,76 @@
   .stars-input{ width:100%; background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
     color:var(--text); font-family:inherit; font-size:0.92rem; padding:11px 12px; margin-top:8px; }
   .stars-input:focus{ outline:2px solid var(--brass); outline-offset:1px; }
+
+  /* ===== ФИКСИРОВАННАЯ ШАПКА (табы + иконки) — настоящий fixed, не sticky:
+     sticky сначала едет вместе с контентом и лишь потом "прилипает", это не подходит,
+     когда нужна стопроцентная неподвижность с самого начала. Высоту меряем в JS и
+     проставляем как отступ контенту — жёстко прописанные пиксели ненадёжны на разных
+     телефонах/шрифтах. ===== */
+  .fixed-header{ position:fixed; top:0; left:0; right:0; background:var(--bg); z-index:30; border-bottom:1px solid var(--line); }
+  .tab-bar-row{ display:flex; align-items:center; justify-content:space-between;
+    max-width:560px; margin:0 auto; padding:10px 16px 10px; }
+  .tab-bar{ display:flex; gap:18px; }
+  .tab-btn{ appearance:none; border:none; border-bottom:2px solid transparent; background:none; color:var(--text-dim);
+    font-size:0.92rem; font-weight:700; padding:9px 2px 10px; cursor:pointer; font-family:inherit; margin-bottom:-1px; }
+  .tab-btn.active{ color:var(--brass); border-bottom-color:var(--brass); }
+  .tab-bar-row .head-icons{ margin-left:0; }
+  .fixed-ekp-row{ position:fixed; left:0; right:0; background:var(--bg); z-index:29; border-bottom:1px solid var(--line); }
+  .fixed-ekp-row .ekp-toprow{ max-width:560px; margin:0 auto; padding:10px 16px 12px; }
+
+  /* ===== ССЫЛКА НА ЕКП ИЗ ТРЕБОВАНИЙ ===== */
+  .ekp-link-btn{ appearance:none; border:none; background:none; color:var(--brass); font-size:0.82rem;
+    font-family:inherit; text-align:left; padding:8px 0 0; cursor:pointer; text-decoration:underline; }
+
+  /* ===== ЭКРАН ЕКП ===== */
+  .ekp-toprow{ display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .ekp-divider{ height:1px; background:var(--line); margin:0 0 14px; }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{ appearance:none; border:1px solid var(--line); background:var(--panel-2); color:var(--text);
+    font-size:0.78rem; padding:6px 12px; border-radius:14px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+  .chip.active{ background:var(--brass); border-color:var(--brass); color:#191410; font-weight:700; }
+  .chip.chip-partial{ background:var(--brass-dim); border-color:var(--brass-dim); color:var(--text); font-weight:700; }
+  .ekp-view-toggle{ appearance:none; border:1px solid var(--line); background:var(--panel-2); border-radius:8px;
+    padding:4px; display:flex; gap:3px; cursor:pointer; flex:none; align-items:center; justify-content:center; width:34px; height:34px; }
+  .ekp-view-toggle svg{ width:18px; height:18px; color:var(--text-dim); }
+  .ekp-view-toggle.active-toggle{ background:var(--brass); border-color:var(--brass); }
+  .ekp-view-toggle.active-toggle svg{ color:#191410; }
+  .tgl-icon{ width:22px; height:22px; border-radius:6px; display:flex; flex-direction:column; justify-content:center; gap:2px; padding:0 5px; }
+  .tgl-compact{ background:var(--panel); } .tgl-compact i{ height:2px; background:var(--text-dim); border-radius:1px; }
+  .tgl-full{ background:var(--brass); } .tgl-full i{ height:5px; background:#191410; border-radius:1px; }
+
+  .ekp-row{ display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:10px;
+    background:var(--panel); margin-bottom:6px; }
+  .ekp-row.state-past{ opacity:0.4; }
+  .ekp-row.state-past .d, .ekp-row.state-past .n{ font-style:italic; }
+  .ekp-row.state-live{ background:var(--panel-2); border-left:3px solid var(--brass); }
+  .ekp-row.state-future .d{ color:var(--text); }
+  .ekp-row .line1{ display:flex; justify-content:space-between; gap:10px; }
+  .ekp-row .d{ font-size:0.76rem; color:var(--text-dim); white-space:nowrap; flex:none; }
+  .ekp-row.state-live .d{ color:var(--brass); font-weight:700; }
+  .ekp-row .p{ font-size:0.76rem; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:right; }
+  .ekp-row .n{ font-size:0.85rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ekp-row.state-live .n{ font-weight:700; }
+
+  .ekp-card{ padding:12px 14px; border-radius:12px; background:var(--panel); margin-bottom:8px; }
+  .ekp-card.state-past{ opacity:0.4; }
+  .ekp-card.state-past .name, .ekp-card.state-past .row1{ font-style:italic; }
+  .ekp-card.state-live{ background:var(--panel-2); border-left:3px solid var(--brass); }
+  .ekp-card.state-future .row1{ color:var(--text); }
+  .ekp-card .row1{ display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.76rem; color:var(--text-dim); }
+  .ekp-card.state-live .row1{ color:var(--brass); font-weight:700; }
+  .ekp-card .name{ font-size:0.9rem; color:var(--text); margin-bottom:4px; }
+  .ekp-card.state-live .name{ font-weight:700; }
+  .ekp-card .meta{ font-size:0.78rem; color:var(--text-dim); }
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <header>
-    <h1>Настрелял на Мастера?</h1>
+<div class="fixed-header" id="fixedHeader">
+  <div class="tab-bar-row">
+    <div class="tab-bar" id="tabBar">
+      <button class="tab-btn active" data-tab="req">Требования</button>
+      <button class="tab-btn" data-tab="ekp">ЕКП</button>
+    </div>
     <div class="head-icons">
       <button class="icon-btn" id="infoBtn" aria-label="О приложении">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="11" x2="12" y2="17.5"/><circle cx="12" cy="6.8" r="1.6" fill="currentColor" stroke="none"/></svg>
@@ -142,8 +209,12 @@
         <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9 12 2"/></svg>
       </button>
     </div>
-  </header>
+  </div>
+</div>
 
+<div class="wrap" id="mainWrap">
+
+  <div id="screenReq">
   <span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Кто я и что хочу?</span>
   <div class="card">
   <div class="field-row-2col">
@@ -166,7 +237,10 @@
   </div>
 
     <div class="field">
-      <span class="field-label">Из чего стреляю</span>
+      <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+        <span class="field-label" style="margin-bottom:0;">Из чего стреляю</span>
+        <button class="q-btn" id="weaponInfoBtn" type="button">?</button>
+      </div>
       <button class="opt-btn dd-btn" id="weaponSelectBtn" type="button">
         <span id="weaponSelectLabel"></span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
@@ -175,7 +249,10 @@
     </div>
 
     <div class="field">
-      <span class="field-label">Хочу получить</span>
+      <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+        <span class="field-label" style="margin-bottom:0;">Хочу получить</span>
+        <button class="q-btn" id="targetInfoBtn" type="button">?</button>
+      </div>
       <button class="opt-btn dd-btn" id="targetSelectBtn" type="button">
         <span id="targetSelectLabel"></span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
@@ -190,17 +267,45 @@
       <div class="btn-row" id="categoryRow"></div>
     </div>
 
-    <div class="field" id="statusField">
-      <span class="field-label">На соревновании</span>
+    <div class="field">
+      <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+        <span class="field-label" style="margin-bottom:0;">На соревновании</span>
+        <button class="q-btn" id="compInfoBtn" type="button">?</button>
+      </div>
       <button class="opt-btn dd-btn" id="compSelectBtn" type="button">
         <span id="compSelectLabel"></span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
       </button>
+      <div class="field-note" id="compUnavailableNote" style="display:none;"></div>
+      <button class="ekp-link-btn" id="gotoEkpBtn" type="button" style="display:none;">Посмотреть такие соревнования в ЕКП</button>
     </div>
   </div>
 
   <div id="resultZone"></div>
 
+  </div>
+
+  <div id="screenEkp" style="display:none;">
+    <div class="ekp-divider"></div>
+    <div class="chip-row" id="ekpWeaponChips" style="margin-bottom:16px;"></div>
+    <div id="ekpList"></div>
+  </div>
+
+</div>
+
+<div class="fixed-ekp-row" id="fixedEkpRow" style="display:none;">
+  <div class="ekp-toprow">
+    <span style="font-size:12px; color:var(--text-dim); flex:none;">Матчи:</span>
+    <div class="chip-row" id="ekpStatusChips" style="flex:1;"></div>
+    <button class="q-btn" id="ekpStatusInfoBtn" type="button">?</button>
+    <button class="ekp-view-toggle" id="ekpHidePastToggle" type="button" aria-label="Не показывать прошедшие">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+    </button>
+    <button class="ekp-view-toggle" id="ekpViewToggle" type="button" aria-label="Переключить вид">
+      <span class="tgl-icon tgl-compact"><i></i><i></i><i></i></span>
+      <span class="tgl-icon tgl-full" style="display:none;"><i></i><i></i></span>
+    </button>
+  </div>
 </div>
 
 <!-- ===== INFO MODAL ===== -->
@@ -214,7 +319,7 @@
       1) Положение о Единой всероссийской спортивной классификации.<br>
       <i>Утверждено приказом Минспорта России от 03.03.2025 №173, с изменениями, внесёнными приказом Минспорта России от 09.07.2025 №510.</i><br>
       <i>Действует с 01.09.2025.</i></p>
-      <p>2) Нормы, требования и условия их выполнения по виду спорта “практическая стрельба”.<br>
+      <p>2) Нормы, требования и условия их выполнения по виду спорта «практическая стрельба».<br>
       <i>Приложение №54 к приказу Минспорта России от 09.04.2026 №299.</i><br>
       <i>Действует с 19.06.2026.</i></p>
       <p>3) Правила вида спорта «практическая стрельба».<br>
@@ -222,10 +327,20 @@
       <i>Действует с 04.12.2025.</i></p>
       <p>Нормативная база, вероятно, будет корректироваться — в текущих редакциях есть противоречия и недоработки, например:</p>
       <p>— Мужчина, занявший 2-е место в пневматической дисциплине на Чемпионате России с 80% от лидера, формально не получает ни 1 разряда (нужно было занять место похуже — например, 4-е), ни КМС (нужно минимум 85%).</p>
-      <p><i>В приложении вместо диапазона мест, которые необходимо занять на матче, мы указываем «не ниже N места» (формально, это не соответствует нормативной базе).</i></p>
+      <p><i>В приложении вместо диапазона мест, которые необходимо занять на матче, мы указываем «не ниже N места» (формально это не соответствует нормативной базе).</i></p>
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v32</p>
+      <p>— Для соревнований со статусом «Другие всероссийские соревнования» нормативка допускает выполнение требований в огнестрельных дисциплинах возрастной категорией юноши/девушки (11–15 лет), но не предусматривает такой возможности для юниоров/юниорок (16–20 лет). Хотя требования к младшим возрастным категориям обычно не мягче, чем к старшим.</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v36</p>
+      <div style="border-top:1px solid var(--line); margin-top:14px; padding-top:14px;">
+        <span class="field-label" style="margin-bottom:10px;">Документы офлайн</span>
+        <div class="btn-row" style="flex-direction:column;">
+          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/polozhenie-evsk.pdf" target="_blank" rel="noopener">Положение о ЕВСК (PDF)</a>
+          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/pravila-vida-sporta.pdf" target="_blank" rel="noopener">Правила вида спорта (PDF)</a>
+          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/normy-trebovania-uslovia.xlsx" target="_blank" rel="noopener">Нормы, требования и условия (XLSX)</a>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
@@ -289,7 +404,10 @@
 <div class="modal-overlay" id="compModal">
   <div class="modal-card">
     <button class="modal-close" data-close="compModal">×</button>
-    <h3 class="modal-title">На соревновании</h3>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin:0 30px 12px 0;">
+      <h3 class="modal-title" style="margin:0;">На соревновании</h3>
+      <button class="hide-inactive-btn" id="compHideInactiveBtn" type="button">Скрыть неактивные</button>
+    </div>
     <div class="modal-body"><div class="btn-row" id="compOptionsList" style="flex-direction:column;"></div></div>
   </div>
 </div>
@@ -315,7 +433,7 @@ const WEAPONS = [
 // Возраст: сочетаем ЕВСК (минимальный возраст для конкретного разряда/звания по оружию)
 // и Правила вида спорта, Таблица 8 (минимальный возраст допуска к соревнованию по возрастной
 // группе). Берём более строгое из двух правил по каждому оружию — см. "О приложении".
-// youth = 11-15 лет, junior = 16-20 лет, adult = "Мужчины/женщины" (нижний порог входа).
+// youth = 11–15 лет, junior = 16–20 лет, adult = "Мужчины/женщины" (нижний порог входа).
 // Держим на клиенте намеренно (а не на воркере) — иначе ползунок возраста будет дёргаться
 // с сетевой задержкой на каждое движение пальцем.
 const WEAPON_AGE = {
@@ -360,7 +478,7 @@ try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expa
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
 const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
-const APP_VERSION = "v32";
+const APP_VERSION = "v36";
 
 async function relay(action, extra){
   const resp = await fetch(RELAY_URL, {
@@ -461,6 +579,42 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>ov.addEventListener('cli
 document.getElementById('infoBtn').addEventListener('click', ()=>openModal('infoModal'));
 document.getElementById('ageInfoBtn').addEventListener('click', ()=>openExplain('agecat'));
 document.getElementById('categoryInfoBtn').addEventListener('click', ()=>openExplain('agecat'));
+document.getElementById('weaponInfoBtn').addEventListener('click', ()=>openExplain('weapon_info'));
+document.getElementById('targetInfoBtn').addEventListener('click', ()=>openExplain('target_info'));
+document.getElementById('compInfoBtn').addEventListener('click', ()=>openExplain('comp_info'));
+
+/* ============ ТАБЫ ЭКРАНОВ ============ */
+function layoutFixedBars(){
+  const headerH = document.getElementById('fixedHeader').offsetHeight;
+  const ekpRow = document.getElementById('fixedEkpRow');
+  const ekpRowVisible = ekpRow.style.display !== 'none';
+  ekpRow.style.top = headerH + 'px';
+  const ekpRowH = ekpRowVisible ? ekpRow.offsetHeight : 0;
+  document.getElementById('mainWrap').style.paddingTop = (headerH + ekpRowH + 16) + 'px';
+}
+window.addEventListener('resize', layoutFixedBars);
+// ResizeObserver отслеживает сами фиксированные бары и пересчитывает отступы при ЛЮБОМ
+// изменении их размера (чипсы дорисовались асинхронно, перенос строки на маленьком экране
+// и т.д.) — без этого пересчёт мог не успеть сработать до того, как контент уже отрисован
+// со старым (недостаточным) отступом.
+if(window.ResizeObserver){
+  const roFixedBars = new ResizeObserver(()=>layoutFixedBars());
+  roFixedBars.observe(document.getElementById('fixedHeader'));
+  roFixedBars.observe(document.getElementById('fixedEkpRow'));
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  document.getElementById('screenReq').style.display = name==='req' ? '' : 'none';
+  document.getElementById('screenEkp').style.display = name==='ekp' ? '' : 'none';
+  document.getElementById('fixedEkpRow').style.display = name==='ekp' ? '' : 'none';
+  if(name==='ekp') ensureEkpLoaded();
+  layoutFixedBars();
+}
+document.getElementById('tabBar').addEventListener('click', (e)=>{
+  const b = e.target.closest('.tab-btn'); if(!b) return;
+  switchTab(b.dataset.tab);
+});
 document.getElementById('feedbackBtn').addEventListener('click', ()=>openModal('feedbackModal'));
 document.getElementById('feedbackSend').addEventListener('click', ()=>{
   const text = document.getElementById('feedbackText').value.trim();
@@ -549,6 +703,43 @@ function openExplain(key, dynBody, dynTitle){
 /* ============ STATE ============ */
 const state = { sex:'m', age:18, weapon:'pistol', target:'r1', category:null, format:'personal', comp:null };
 
+/* ============ ЗАПОМИНАНИЕ ПАРАМЕТРОВ (пол/возраст/оружие) ============
+   Пробуем Telegram CloudStorage (переживает переустановку, синхронизируется между устройствами
+   в рамках одного бота), при недоступности — обычный localStorage как резерв. */
+function saveParams(){
+  const payload = JSON.stringify({ sex:state.sex, age:state.age, weapon:state.weapon });
+  try{
+    if(tg && tg.CloudStorage && tg.CloudStorage.setItem){
+      tg.CloudStorage.setItem('saved_params', payload, ()=>{});
+    } else {
+      localStorage.setItem('mnm_saved_params', payload);
+    }
+  }catch(e){}
+}
+function loadParams(){
+  return new Promise((resolve)=>{
+    try{
+      if(tg && tg.CloudStorage && tg.CloudStorage.getItem){
+        tg.CloudStorage.getItem('saved_params', (err, value)=>{
+          if(!err && value) { try{ resolve(JSON.parse(value)); return; }catch(e){} }
+          resolve(null);
+        });
+        return;
+      }
+    }catch(e){}
+    try{
+      const v = localStorage.getItem('mnm_saved_params');
+      resolve(v ? JSON.parse(v) : null);
+    }catch(e){ resolve(null); }
+  });
+}
+function applySavedParams(saved){
+  if(!saved) return;
+  if(saved.sex==='m' || saved.sex==='f') state.sex = saved.sex;
+  if(typeof saved.age==='number' && saved.age>=10 && saved.age<=21) state.age = saved.age;
+  if(WEAPONS.find(w=>w.id===saved.weapon)) state.weapon = saved.weapon;
+}
+
 function setActive(group, value){
   document.querySelectorAll('.opt-btn[data-group="'+group+'"]').forEach(b=>b.classList.toggle('active', b.dataset.value===value));
 }
@@ -557,7 +748,7 @@ function wireButtons(group, onSet){
     b.addEventListener('click', ()=>{ if(b.classList.contains('disabled')) return; onSet(b.dataset.value); setActive(group, b.dataset.value); render(); });
   });
 }
-wireButtons('sex', v=>state.sex=v);
+wireButtons('sex', v=>{ state.sex=v; saveParams(); });
 setActive('sex', state.sex);
 
 /* ---- возраст ---- */
@@ -574,6 +765,7 @@ ageSlider.addEventListener('input', ()=>{
   updateAgeLabel();
   recomputeWeaponAvailability();
   recomputeCategoryAndRender();
+  saveParams();
 });
 updateAgeLabel();
 
@@ -603,6 +795,7 @@ document.getElementById('weaponOptionsList').addEventListener('click', async (e)
   const b = e.target.closest('.opt-btn[data-weapon-id]'); if(!b || b.classList.contains('disabled')) return;
   state.weapon = b.dataset.weaponId; weaponSelectLabel.textContent = b.textContent;
   closeModal('weaponModal'); recomputeWeaponAvailability();
+  saveParams();
   await loadAndRender();
 });
 weaponSelectLabel.textContent = WEAPONS.find(w=>w.id===state.weapon).label;
@@ -690,39 +883,102 @@ async function loadAndRender(){
   recomputeCategoryAndRender();
 }
 
+// Полный перечень статусов соревнований во всей ЕВСК — не зависит от текущего оружия/возраста/цели
+// (это структура классификации сама по себе, а не производная от конкретной комбинации параметров).
+// Доступность конкретного статуса для ТЕКУЩЕЙ комбинации проверяется отдельно, через currentPrograms().
+const ALL_STATUSES = [
+  {id:'world_champ', label:'Чемпионат мира', group:'international'},
+  {id:'europe_champ', label:'Чемпионат Европы', group:'international'},
+  {id:'world_junior', label:'Первенство мира', group:'international'},
+  {id:'europe_junior', label:'Первенство Европы', group:'international'},
+  {id:'intl_other', label:'Другое международное соревнование (ЕКП)', group:'international'},
+  {id:'russia_champ', label:'Чемпионат России (ЧР)', group:'allrussian'},
+  {id:'russia_cup', label:'Финал Кубка России (ФКР)', group:'allrussian'},
+  {id:'russia_junior', label:'Первенство России', group:'allrussian'},
+  {id:'allru_other', label:'Всероссийское соревнование (кроме ЧР и ФКР)', group:'allrussian'},
+  {id:'fo_champ', label:'Чемпионат федерального округа', group:'interregional'},
+  {id:'fo_junior', label:'Первенство федерального округа', group:'interregional'},
+  {id:'interregional_other', label:'Другие межрегиональные соревнования', group:'interregional'},
+  {id:'msk_spb_champ', label:'Чемпионат Москвы / Санкт-Петербурга', group:'regional'},
+  {id:'msk_spb_junior', label:'Первенство Москвы / Санкт-Петербурга', group:'regional'},
+  {id:'subject_champ', label:'Чемпионат субъекта РФ (кроме Москвы и СПб)', group:'regional'},
+  {id:'subject_cup', label:'Финал Кубка субъекта (кроме Москвы и СПб)', group:'regional'},
+  {id:'subject_junior', label:'Первенство субъекта РФ', group:'regional'},
+  {id:'subject_other', label:'Другие соревнования субъекта РФ', group:'regional'},
+  {id:'fizkult', label:'Физкультурные мероприятия субъекта РФ', group:'municipal'},
+  {id:'municipal_champ', label:'Чемпионат муниципального образования', group:'municipal'},
+  {id:'municipal_junior', label:'Первенство муниципального образования', group:'municipal'},
+  {id:'municipal_other', label:'Другие соревнования муниципального образования', group:'municipal'},
+];
+let compHideInactive = false;
+function renderCompOptions(){
+  const list = currentPrograms();
+  const availableIds = new Set(list.map(c=>c.id));
+  const opts = document.getElementById('compOptionsList');
+  let html = ''; let lastGroup = null;
+  ALL_STATUSES.forEach(s=>{
+    const isAvailable = availableIds.has(s.id);
+    if(compHideInactive && !isAvailable) return;
+    if(s.group!==lastGroup){ html += `<div class="group-sep">— ${META.GROUP_LABELS[s.group]} —</div>`; lastGroup=s.group; }
+    const active = s.id===state.comp ? ' active' : '';
+    const inactive = isAvailable ? '' : ' opt-inactive';
+    html += `<button class="opt-btn${active}${inactive}" data-comp-id="${s.id}" data-available="${isAvailable}">${s.label}</button>`;
+  });
+  opts.innerHTML = html || '<div class="field-note">Нет статусов, соответствующих текущему фильтру.</div>';
+}
+document.getElementById('compHideInactiveBtn').addEventListener('click', ()=>{
+  compHideInactive = !compHideInactive;
+  document.getElementById('compHideInactiveBtn').classList.toggle('active', compHideInactive);
+  renderCompOptions();
+});
+
 /* ---- статус соревнования ---- */
 const compSelectBtn = document.getElementById('compSelectBtn');
 const compSelectLabel = document.getElementById('compSelectLabel');
 compSelectBtn.addEventListener('click', ()=>{
-  const list = currentPrograms();
-  const opts = document.getElementById('compOptionsList');
-  let html = ''; let lastGroup = null;
-  list.forEach(c=>{
-    if(c.group!==lastGroup){ html += `<div class="group-sep">— ${META.GROUP_LABELS[c.group]} —</div>`; lastGroup=c.group; }
-    const active = c.id===state.comp ? ' active' : '';
-    html += `<button class="opt-btn${active}" data-comp-id="${c.id}">${c.label}</button>`;
-  });
-  opts.innerHTML = html || '<div class="field-note">Нет доступных соревнований для этой комбинации.</div>';
+  renderCompOptions();
   openModal('compModal');
 });
 document.getElementById('compOptionsList').addEventListener('click', (e)=>{
   const b = e.target.closest('.opt-btn[data-comp-id]'); if(!b) return;
-  state.comp = b.dataset.compId; compSelectLabel.textContent = b.textContent;
+  if(b.dataset.available !== 'true') return; // неактивный статус — просто ничего не делаем
+  const s = ALL_STATUSES.find(x=>x.id===b.dataset.compId);
+  state.comp = s.id; state.compLabel = s.label; compSelectLabel.textContent = s.label;
+  document.getElementById('compUnavailableNote').style.display = 'none';
+  compSelectBtn.classList.remove('invalid');
   closeModal('compModal'); render();
 });
 function currentPrograms(){ return effectivePrograms(state.weapon, state.category, state.target); }
+// Выбранный статус соревнования сознательно НЕ сбрасывается сам по себе при смене
+// пола/возраста/оружия/цели. Если для новой комбинации он недоступен — поле визуально
+// затеняется и показывается пояснение, но state.comp и подпись сохраняются как есть.
 function populateCompetitions(){
   const list = currentPrograms();
+  const note = document.getElementById('compUnavailableNote');
   if(list.length===0){
-    state.comp = null; compSelectLabel.textContent = 'Нет доступных соревнований';
     compSelectBtn.classList.add('invalid');
+    note.style.display = 'none';
     render(); return;
   }
-  compSelectBtn.classList.remove('invalid');
-  if(!list.find(c=>c.id===state.comp)){ state.comp = list[0].id; }
-  compSelectLabel.textContent = list.find(c=>c.id===state.comp).label;
+  const found = list.find(c=>c.id===state.comp);
+  if(found){
+    compSelectBtn.classList.remove('invalid');
+    compSelectLabel.textContent = found.label;
+    note.style.display = 'none';
+  } else if(state.comp){
+    compSelectBtn.classList.add('invalid');
+    compSelectLabel.textContent = state.compLabel || found_placeholder();
+    note.textContent = 'Данное соревнование недоступно для выбранных параметров.';
+    note.style.display = '';
+  } else {
+    state.comp = list[0].id; state.compLabel = list[0].label;
+    compSelectBtn.classList.remove('invalid');
+    compSelectLabel.textContent = list[0].label;
+    note.style.display = 'none';
+  }
   render();
 }
+function found_placeholder(){ return 'Статус не выбран'; }
 
 /* ---- формат участия (в результатах) ---- */
 document.getElementById('resultZone').addEventListener('click', (e)=>{
@@ -793,17 +1049,24 @@ function render(){
   const zone = document.getElementById('resultZone');
 
   if(!state.category){
+    updateGotoEkpBtn(null);
     zone.innerHTML = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>
       <div class="card card-output"><div class="r-headline state-na">В этом возрасте выбранное оружие / целевой разряд (звание) недоступны.</div></div>`;
     return;
   }
 
   const list = currentPrograms();
-  const comp = list.find(c=>c.id===state.comp) || list[0];
+  const comp = list.find(c=>c.id===state.comp);
+  updateGotoEkpBtn(comp);
 
-  if(!comp){
+  if(list.length===0){
     zone.innerHTML = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>
       <div class="card card-output"><div class="r-headline state-na">Для этой комбинации возраста/оружия/цели подходящих статусов соревнований в ЕВСК не нашлось.</div></div>`;
+    return;
+  }
+  if(!comp){
+    zone.innerHTML = `<span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Что для этого нужно?</span>
+      <div class="card card-output"><div class="r-headline state-na">Выбранный статус соревнования недоступен для этой комбинации возраста/оружия/цели — выберите другой в поле «На соревновании».</div></div>`;
     return;
   }
 
@@ -886,6 +1149,217 @@ function render(){
   void zone.offsetHeight; // принудительный reflow — лечит визуальные наезды блоков друг на друга в Safari/WebKit после innerHTML
 }
 
+/* ============ КНОПКА "ПОСМОТРЕТЬ В ЕКП" (из экрана Требования) ============
+   Показываем только если выбранный статус попадает в ЕКП (межрегиональный/всероссийский/
+   международный уровень) — региональные и муниципальные статусы там просто отсутствуют. */
+const EKP_GROUPS = ['interregional','allrussian','international'];
+const GROUP_TO_EKP_STATUS = { interregional:'МРС', allrussian:'ВС', international:'МЕЖД' };
+const APP_WEAPON_TO_EKP = { pistol:['Пистолет'], revolver:['Револьвер'], rifle:['Карабин','КПК','Ружьё','Троеборье'], pneumatic:['Пневматика'] };
+// Точное сопоставление id статуса из "Требования" с реальным текстом "Тип соревнований" в ЕКП —
+// нужно, чтобы переход между вкладками бил не просто в широкую группу (МРС/ВС/МЕЖД), а в
+// конкретный вид соревнования, если он есть в календаре. "Другие..." (allru_other, intl_other) —
+// это явный "все остальные, КРОМЕ поимённо перечисленных" статус, поэтому Чемпионат мира/Европы
+// сюда НЕ входят — под них в календаре просто нет отдельного типа, и это должно значить
+// "показать ничего", а не "показать более широкую группу". Тот же принцип и для
+// interregional_other — своего типа в ЕКП у него нет.
+const EKP_NO_MATCH = '__NO_EKP_MATCH__';
+const COMP_ID_TO_EKP_CTYPE = {
+  russia_champ: 'Чемпионат России',
+  russia_cup: 'Финал Кубка России (ФКР)',
+  allru_other: 'Всероссийское соревнование (кроме ЧР и ФКР)',
+  fo_champ: 'Чемпионат федерального округа',
+  fo_junior: 'Первенство федерального округа',
+  russia_junior: 'Первенство России',
+  intl_other: 'Другие международные соревнования',
+  world_champ: EKP_NO_MATCH,
+  europe_champ: EKP_NO_MATCH,
+  world_junior: EKP_NO_MATCH,
+  europe_junior: EKP_NO_MATCH,
+  interregional_other: EKP_NO_MATCH,
+};
+function updateGotoEkpBtn(comp){
+  const btn = document.getElementById('gotoEkpBtn');
+  if(comp && !comp.blocked && EKP_GROUPS.includes(comp.group)){
+    btn.style.display = '';
+    btn.onclick = ()=>{
+      ekpFilter.status = new Set([GROUP_TO_EKP_STATUS[comp.group]]);
+      ekpFilter.weapon = new Set(APP_WEAPON_TO_EKP[state.weapon] || []);
+      ekpFilter.ctype = COMP_ID_TO_EKP_CTYPE[comp.id] || EKP_NO_MATCH;
+      ekpHidePast = false;
+      switchTab('ekp');
+      ensureEkpLoaded().then(()=>{ renderEkpChips(); renderEkpList(); scrollEkpListToFirstUpcoming(); });
+    };
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+/* ============ ЭКРАН ЕКП ============
+   Данные приходят отдельным экшеном с воркера (KV, обновляется без переразвёртывания кода).
+   Ожидаемый формат события: { start, end, status, name, name_short, place, place_full, weapons:[], ages:[] }
+   status — одно из: 'МРС' | 'ВС' | 'МЕЖД' (единственные уровни, которые вообще попадают в ЕКП). */
+let ekpEvents = null;
+let ekpLoading = false;
+const ekpFilter = { status: new Set(['МРС','ВС','МЕЖД']), weapon: new Set(), ctype: null };
+let ekpCompact = true;
+let ekpHidePast = false;
+
+const EKP_STATUSES = ['МРС','ВС','МЕЖД'];
+const EKP_WEAPONS = ['Пистолет','Револьвер','Карабин','КПК','Ружьё','Троеборье','Пневматика','IDPA'];
+
+async function ensureEkpLoaded(){
+  if(ekpEvents || ekpLoading) { renderEkpChips(); renderEkpList(); return; }
+  ekpLoading = true;
+  document.getElementById('ekpList').innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="spinner-text">Загружаю календарь...</div></div>`;
+  try{
+    const r = await relayWithRetry('calendar', {});
+    ekpEvents = (r && r.events) || [];
+  }catch(e){
+    ekpEvents = [];
+    document.getElementById('ekpList').innerHTML = `<div class="load-error">Не получилось загрузить календарь. Попробуй ещё раз.</div>`;
+    ekpLoading = false;
+    return;
+  }
+  ekpLoading = false;
+  renderEkpChips();
+  renderEkpList();
+  layoutFixedBars();
+}
+
+function scrollEkpListToFirstUpcoming(){
+  // двойной requestAnimationFrame гарантирует, что браузер уже пересчитал раскладку
+  // после рендера списка и подгонки отступов под фиксированные панели — иначе расчёт
+  // позиции может промахнуться мимо цели, пока высоты ещё не стабилизировались
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const rows = document.querySelectorAll('#ekpList [data-ekp-id]');
+      let target = null;
+      for(const el of rows){
+        if(!el.classList.contains('state-past')){ target = el; break; }
+      }
+      if(!target){ window.scrollTo(0,0); return; }
+      const headerH = document.getElementById('fixedHeader').offsetHeight;
+      const ekpRow = document.getElementById('fixedEkpRow');
+      const ekpRowH = ekpRow.style.display !== 'none' ? ekpRow.offsetHeight : 0;
+      // offsetTop у первого элемента списка уже включает весь верхний паддинг mainWrap
+      // (headerH + ekpRowH + 16) — вычитаем только headerH+ekpRowH, чтобы остался
+      // тот же самый 16px зазор сверху, что и в обычном виде списка без прокрутки
+      window.scrollTo(0, target.offsetTop - headerH - ekpRowH);
+    });
+  });
+}
+
+function renderEkpChips(){
+  const statusEl = document.getElementById('ekpStatusChips');
+  statusEl.innerHTML = EKP_STATUSES.map(s=>{
+    let cls = '';
+    if(ekpFilter.status.has(s)) cls = ekpFilter.ctype ? ' chip-partial' : ' active';
+    return `<button class="chip${cls}" data-ekp-status="${s}">${s}</button>`;
+  }).join('');
+  const weaponEl = document.getElementById('ekpWeaponChips');
+  weaponEl.innerHTML = EKP_WEAPONS.map(w=>
+    `<button class="chip${ekpFilter.weapon.has(w)?' active':''}" data-ekp-weapon="${w}">${w}</button>`
+  ).join('');
+  document.getElementById('ekpHidePastToggle').classList.toggle('active-toggle', ekpHidePast);
+}
+document.getElementById('ekpStatusChips').addEventListener('click', (e)=>{
+  const b = e.target.closest('[data-ekp-status]'); if(!b) return;
+  const v = b.dataset.ekpStatus;
+  ekpFilter.status.has(v) ? ekpFilter.status.delete(v) : ekpFilter.status.add(v);
+  ekpFilter.ctype = null;
+  renderEkpChips(); renderEkpList();
+});
+document.getElementById('ekpWeaponChips').addEventListener('click', (e)=>{
+  const b = e.target.closest('[data-ekp-weapon]'); if(!b) return;
+  const v = b.dataset.ekpWeapon;
+  ekpFilter.weapon.has(v) ? ekpFilter.weapon.delete(v) : ekpFilter.weapon.add(v);
+  ekpFilter.ctype = null;
+  renderEkpChips(); renderEkpList();
+});
+document.getElementById('ekpStatusInfoBtn').addEventListener('click', ()=>openExplain('ekp_info'));
+document.getElementById('ekpHidePastToggle').addEventListener('click', ()=>{
+  ekpHidePast = !ekpHidePast;
+  renderEkpChips();
+  renderEkpList();
+});
+
+// при переключении полный/сокращённый вид запоминаем, какое событие сейчас видно
+// первым сверху экрана, и после перерисовки прокручиваем обратно к нему без анимации —
+// иначе список визуально "уезжает", пока браузер плавно долистывает до нужной точки
+document.getElementById('ekpViewToggle').addEventListener('click', ()=>{
+  let anchorId = null;
+  document.querySelectorAll('#ekpList [data-ekp-id]').forEach(el=>{
+    if(anchorId===null && el.getBoundingClientRect().bottom > 0) anchorId = el.dataset.ekpId;
+  });
+  ekpCompact = !ekpCompact;
+  document.querySelector('#ekpViewToggle .tgl-compact').style.display = ekpCompact ? '' : 'none';
+  document.querySelector('#ekpViewToggle .tgl-full').style.display = ekpCompact ? 'none' : '';
+  renderEkpList();
+  if(anchorId){
+    const el = document.querySelector(`#ekpList [data-ekp-id="${anchorId}"]`);
+    if(el) el.scrollIntoView({block:'start'});
+  }
+});
+
+function ekpDayState(ev){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(ev.start), end = new Date(ev.end);
+  if(end < today) return 'past';
+  if(start > today) return 'future';
+  return 'live';
+}
+function ekpDateLabel(iso){
+  const MONTHS = ['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+const ekpExpandedIds = new Set();
+
+function renderEkpCompactRow(ev, st){
+  return `<div class="ekp-row state-${st}" data-ekp-id="${ev.id}">
+    <div class="line1"><span class="d">${ekpDateLabel(ev.start)}</span><span class="p">${ev.place}</span></div>
+    <span class="n">${ev.name_short}</span>
+  </div>`;
+}
+function renderEkpFullCard(ev, st){
+  const liveTag = st==='live' ? ' · идёт' : '';
+  return `<div class="ekp-card state-${st}" data-ekp-id="${ev.id}">
+    <div class="row1"><span>${ekpDateLabel(ev.start)} – ${ekpDateLabel(ev.end)}${liveTag}</span><span>${ev.status}</span></div>
+    <div class="name">${ev.name}</div>
+    <div class="meta">${ev.place_full}</div>
+    <div class="meta">${ev.weapons.join(', ')}</div>
+    <div class="meta">${ev.ages.join(', ')}</div>
+  </div>`;
+}
+function renderEkpList(){
+  if(!ekpEvents) return;
+  let list = ekpEvents;
+  list = list.filter(ev=>ekpFilter.status.has(ev.status));
+  if(ekpFilter.weapon.size) list = list.filter(ev=>ev.weapons.some(w=>ekpFilter.weapon.has(w)));
+  if(ekpFilter.ctype) list = list.filter(ev=>ev.ctype===ekpFilter.ctype);
+  if(ekpHidePast) list = list.filter(ev=>ekpDayState(ev)!=='past');
+  list = list.slice().sort((a,b)=> new Date(a.start) - new Date(b.start));
+
+  const el = document.getElementById('ekpList');
+  if(list.length===0){ el.innerHTML = `<div class="field-note">Нет матчей под выбранные фильтры.</div>`; return; }
+
+  el.innerHTML = list.map(ev=>{
+    const st = ekpDayState(ev);
+    const showFull = !ekpCompact || ekpExpandedIds.has(String(ev.id));
+    return showFull ? renderEkpFullCard(ev, st) : renderEkpCompactRow(ev, st);
+  }).join('');
+}
+// Тап по конкретному матчу больше никуда не переключает вкладку — он просто разворачивает
+// именно эту карточку в полный вид (если общий режим списка сейчас "сокращённый"), повторный
+// тап сворачивает обратно. Если общий режим и так "полный" — тап ни на что не влияет.
+document.getElementById('ekpList').addEventListener('click', (e)=>{
+  const row = e.target.closest('[data-ekp-id]'); if(!row) return;
+  if(!ekpCompact) return;
+  const id = row.dataset.ekpId;
+  ekpExpandedIds.has(id) ? ekpExpandedIds.delete(id) : ekpExpandedIds.add(id);
+  renderEkpList();
+});
+
 /* ============ СПИННЕР ЗАГРУЗКИ ============ */
 function showSpinner(text){
   document.getElementById('resultZone').innerHTML =
@@ -899,6 +1373,16 @@ function showLoadError(){
 /* ============ ИНИЦИАЛИЗАЦИЯ ============ */
 async function boot(){
   showSpinner('Загружаю приложение...');
+  layoutFixedBars();
+  try{
+    const saved = await loadParams();
+    applySavedParams(saved);
+  }catch(e){}
+  // применяем восстановленные значения к самим элементам управления
+  setActive('sex', state.sex);
+  ageSlider.value = state.age;
+  updateAgeLabel();
+  weaponSelectLabel.textContent = WEAPONS.find(w=>w.id===state.weapon).label;
   try{
     await ensureLoaded(state.weapon, state.target);
   }catch(e){
