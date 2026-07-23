@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Настрелял на Мастера? — версия v36 -->
+<!-- Настрелял на Мастера? — версия v37 -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -56,6 +56,12 @@
     font-size:0.72rem; padding:5px 10px; border-radius:10px; cursor:pointer; font-family:inherit; flex:none; white-space:nowrap; }
   .hide-inactive-btn.active{ background:var(--brass); border-color:var(--brass); color:#191410; font-weight:700; }
   #compOptionsList .opt-btn.opt-inactive{ opacity:0.4; cursor:default; }
+  .doc-row{ display:flex; align-items:stretch; gap:6px; }
+  .doc-row .opt-btn{ flex:1; }
+  .doc-send-btn{ appearance:none; border:1px solid var(--line); background:var(--panel-2); color:var(--text-dim);
+    border-radius:10px; padding:0; width:42px; flex:none; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .doc-send-btn svg{ width:18px; height:18px; }
+  .doc-send-btn:active{ background:var(--brass); border-color:var(--brass); color:#191410; }
   #compOptionsList .opt-btn, #targetOptionsList .opt-btn, #weaponOptionsList .opt-btn{ width:100%; text-align:left; }
   .group-sep{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--brass);
     text-align:center; margin:14px 0 6px; font-weight:700; }
@@ -331,15 +337,30 @@
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
       <p>— Для соревнований со статусом «Другие всероссийские соревнования» нормативка допускает выполнение требований в огнестрельных дисциплинах возрастной категорией юноши/девушки (11–15 лет), но не предусматривает такой возможности для юниоров/юниорок (16–20 лет). Хотя требования к младшим возрастным категориям обычно не мягче, чем к старшим.</p>
-      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v36</p>
+      <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v37</p>
       <div style="border-top:1px solid var(--line); margin-top:14px; padding-top:14px;">
         <span class="field-label" style="margin-bottom:10px;">Документы офлайн</span>
-        <div class="btn-row" style="flex-direction:column;">
-          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/polozhenie-evsk.pdf" target="_blank" rel="noopener">Положение о ЕВСК (PDF)</a>
-          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/pravila-vida-sporta.pdf" target="_blank" rel="noopener">Правила вида спорта (PDF)</a>
-          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/normy-trebovania-uslovia.xlsx" target="_blank" rel="noopener">Нормы, требования и условия (XLSX)</a>
+        <div class="btn-row" style="flex-direction:column; gap:6px;">
+          <div class="doc-row">
+            <button class="opt-btn doc-open-btn" data-doc-url="docs/polozhenie-evsk.pdf" style="text-align:left;">Положение о ЕВСК (PDF)</button>
+            <button class="doc-send-btn" data-doc-key="polozhenie" type="button" aria-label="Отправить в чат с ботом" title="Отправить в чат с ботом">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9 22 2Z"/></svg>
+            </button>
+          </div>
+          <div class="doc-row">
+            <button class="opt-btn doc-open-btn" data-doc-url="docs/pravila-vida-sporta.pdf" style="text-align:left;">Правила вида спорта (PDF)</button>
+            <button class="doc-send-btn" data-doc-key="pravila" type="button" aria-label="Отправить в чат с ботом" title="Отправить в чат с ботом">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9 22 2Z"/></svg>
+            </button>
+          </div>
+          <div class="doc-row">
+            <button class="opt-btn doc-open-btn" data-doc-url="docs/normy-trebovania-uslovia.xlsx" style="text-align:left;">Нормы, требования и условия (XLSX)</button>
+            <button class="doc-send-btn" data-doc-key="normy" type="button" aria-label="Отправить в чат с ботом" title="Отправить в чат с ботом">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9 22 2Z"/></svg>
+            </button>
+          </div>
         </div>
-
+        <div class="field-note" id="docSendNote" style="display:none;"></div>
       </div>
     </div>
   </div>
@@ -478,7 +499,7 @@ try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expa
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
 const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
-const APP_VERSION = "v36";
+const APP_VERSION = "v37";
 
 async function relay(action, extra){
   const resp = await fetch(RELAY_URL, {
@@ -1358,6 +1379,48 @@ document.getElementById('ekpList').addEventListener('click', (e)=>{
   const id = row.dataset.ekpId;
   ekpExpandedIds.has(id) ? ekpExpandedIds.delete(id) : ekpExpandedIds.add(id);
   renderEkpList();
+});
+
+/* ============ ДОКУМЕНТЫ ОФЛАЙН ============
+   Открытие по обычной ссылке заставляет Telegram спрашивать "Open URL? Yes/No" и уходить
+   во внешний браузер — качаем файл через fetch() и открываем как blob (не считается внешней
+   навигацией, вопроса не будет). window.open, а не location.href — иначе страница мини-эппа
+   заменяется и вернуться в приложение нельзя. */
+document.querySelectorAll('.doc-open-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const url = btn.dataset.docUrl;
+    const originalText = btn.textContent;
+    btn.textContent = 'Открываю...';
+    try{
+      const resp = await fetch(url);
+      if(!resp.ok) throw new Error('HTTP ' + resp.status);
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    }catch(e){
+      alert('Не получилось открыть документ. Проверьте соединение и попробуйте ещё раз.');
+    }finally{
+      btn.textContent = originalText;
+    }
+  });
+});
+document.querySelectorAll('.doc-send-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const note = document.getElementById('docSendNote');
+    if(!tg || !tg.initData){
+      note.textContent = 'Отправка в чат работает только внутри Telegram.';
+      note.style.display = '';
+      return;
+    }
+    try{
+      const r = await relayWithRetry('send_document', { initData: tg.initData, docKey: btn.dataset.docKey });
+      note.textContent = r && r.ok ? 'Отправлено в чат с ботом.' : 'Не получилось отправить: ' + ((r && r.error) || 'ошибка');
+      note.style.display = '';
+    }catch(e){
+      note.textContent = 'Не получилось отправить документ.';
+      note.style.display = '';
+    }
+  });
 });
 
 /* ============ СПИННЕР ЗАГРУЗКИ ============ */
