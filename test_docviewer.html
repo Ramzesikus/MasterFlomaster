@@ -50,12 +50,32 @@
 </div>
 
 <div class="row">
-  <button class="opt" id="btnBlob">Вариант А — Blob
+  <button class="opt" id="btnBlobPdf">А — Blob (PDF)
     <span class="tag">fetch() → blob-URL → open</span>
   </button>
-  <button class="opt" id="btnEmbed">Вариант Б — Встроенный просмотр
+  <button class="opt" id="btnBlobXlsx">А — Blob (XLSX)
+    <span class="tag">fetch() → blob-URL → open</span>
+  </button>
+</div>
+
+<div class="row">
+  <button class="opt" id="btnEmbed">Б — Встроенный просмотр
     <span class="tag">pdf.js / SheetJS, рисуем сами</span>
   </button>
+  <button class="opt" id="btnSendChat">В — Прислать в чат
+    <span class="tag">sendDocument через бота</span>
+  </button>
+</div>
+
+<div class="file-picker" style="margin-top:0;">
+  <label>Ключ документа для варианта В (какой из трёх прислать):</label>
+  <select id="docKey" style="background:var(--panel-2); border:1px solid var(--line); color:var(--text); padding:8px 10px; border-radius:8px; font-family:inherit;">
+    <option value="polozhenie">Положение о ЕВСК</option>
+    <option value="pravila">Правила вида спорта</option>
+    <option value="normy">Нормы, требования и условия</option>
+  </select>
+  <label>Адрес тестового воркера (для варианта В):</label>
+  <input type="text" id="relayUrl" value="https://doc-send-test.khristoforov-ra.workers.dev">
 </div>
 
 <div id="log">Лог событий появится здесь.</div>
@@ -74,24 +94,56 @@ function log(msg){
 log('Готово. Жми любую из кнопок выше.');
 
 /* ================= ВАРИАНТ А — BLOB ================= */
-document.getElementById('btnBlob').addEventListener('click', async ()=>{
-  const url = document.getElementById('pdfUrl').value;
-  log('Вариант А: качаю файл через fetch()...');
+async function openAsBlob(url, label){
+  log(`Вариант А (${label}): качаю файл через fetch()...`);
   try{
     const resp = await fetch(url);
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     const blob = await resp.blob();
     const blobUrl = URL.createObjectURL(blob);
-    log('Файл скачан (' + Math.round(blob.size/1024) + ' КБ). Пробую открыть blob-URL...');
-    // Пробуем два способа открытия blob — сравните, какой реально сработает без диалога
-    window.open(blobUrl, '_blank');
-    log('window.open(blobUrl) вызван. Если это не сработало — раскомментируй location.href в коде и попробуй ещё раз.');
+    log('Файл скачан (' + Math.round(blob.size/1024) + ' КБ). Пробую открыть blob-URL через location.href...');
+    // window.open(blobUrl, '_blank'); // если location.href не сработает — попробуйте это вместо него
     location.href = blobUrl;
   }catch(e){
     log('ОШИБКА: ' + e.message);
   }
+}
+document.getElementById('btnBlobPdf').addEventListener('click', ()=>{
+  openAsBlob(document.getElementById('pdfUrl').value, 'PDF');
+});
+document.getElementById('btnBlobXlsx').addEventListener('click', ()=>{
+  openAsBlob(document.getElementById('xlsxUrl').value, 'XLSX');
 });
 
+/* ================= ВАРИАНТ В — ПРИСЛАТЬ В ЧАТ ================= */
+document.getElementById('btnSendChat').addEventListener('click', async ()=>{
+  if(!tg){
+    log('Telegram.WebApp недоступен — эта кнопка работает только внутри настоящего Telegram Mini App, не в обычном браузере.');
+    return;
+  }
+  const relayUrl = document.getElementById('relayUrl').value;
+  const docKey = document.getElementById('docKey').value;
+  log('Вариант В: отправляю initData + docKey="' + docKey + '" на воркер...');
+  try{
+    const resp = await fetch(relayUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        action: 'send_document',
+        initData: tg.initData,
+        docKey: docKey,
+      }),
+    });
+    const data = await resp.json();
+    if(data.ok){
+      log('Готово — воркер отчитался об успехе. Проверьте личный чат с ботом.');
+    } else {
+      log('Воркер вернул ошибку: ' + (data.error || JSON.stringify(data)));
+    }
+  }catch(e){
+    log('ОШИБКА запроса: ' + e.message);
+  }
+});
 /* ================= ВАРИАНТ Б — ВСТРОЕННЫЙ ПРОСМОТР ================= */
 document.getElementById('btnEmbed').addEventListener('click', async ()=>{
   const viewer = document.getElementById('viewer');
