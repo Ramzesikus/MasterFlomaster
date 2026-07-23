@@ -130,15 +130,15 @@
      когда нужна стопроцентная неподвижность с самого начала. Высоту меряем в JS и
      проставляем как отступ контенту — жёстко прописанные пиксели ненадёжны на разных
      телефонах/шрифтах. ===== */
-  .fixed-header{ position:fixed; top:0; left:0; right:0; background:var(--bg); z-index:30; }
-  .tab-bar-row{ display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line);
+  .fixed-header{ position:fixed; bottom:0; left:0; right:0; background:var(--bg); z-index:30; border-top:1px solid var(--line); }
+  .tab-bar-row{ display:flex; align-items:center; justify-content:space-between;
     max-width:560px; margin:0 auto; padding:10px 16px 10px; }
   .tab-bar{ display:flex; gap:18px; }
   .tab-btn{ appearance:none; border:none; border-bottom:2px solid transparent; background:none; color:var(--text-dim);
     font-size:0.92rem; font-weight:700; padding:9px 2px 10px; cursor:pointer; font-family:inherit; margin-bottom:-1px; }
   .tab-btn.active{ color:var(--brass); border-bottom-color:var(--brass); }
   .tab-bar-row .head-icons{ margin-left:0; }
-  .fixed-ekp-row{ position:fixed; left:0; right:0; background:var(--bg); z-index:29; border-bottom:1px solid var(--line); }
+  .fixed-ekp-row{ position:fixed; left:0; right:0; background:var(--bg); z-index:29; border-top:1px solid var(--line); }
   .fixed-ekp-row .ekp-toprow{ max-width:560px; margin:0 auto; padding:10px 16px 12px; }
 
   /* ===== ССЫЛКА НА ЕКП ИЗ ТРЕБОВАНИЙ ===== */
@@ -269,7 +269,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
       </button>
       <div class="field-note" id="compUnavailableNote" style="display:none;"></div>
-      <button class="ekp-link-btn" id="gotoEkpBtn" type="button" style="display:none;">Посмотреть какие есть соревнования в ЕКП?</button>
+      <button class="ekp-link-btn" id="gotoEkpBtn" type="button" style="display:none;">Посмотреть такие соревнования в ЕКП</button>
     </div>
   </div>
 
@@ -575,14 +575,11 @@ document.getElementById('compInfoBtn').addEventListener('click', ()=>openExplain
 /* ============ ТАБЫ ЭКРАНОВ ============ */
 function layoutFixedBars(){
   const headerH = document.getElementById('fixedHeader').offsetHeight;
-  document.getElementById('mainWrap').style.paddingTop = (headerH + 16) + 'px';
   const ekpRow = document.getElementById('fixedEkpRow');
-  ekpRow.style.top = headerH + 'px';
-  if(ekpRow.style.display !== 'none'){
-    document.getElementById('screenEkp').style.paddingTop = ekpRow.offsetHeight + 'px';
-  } else {
-    document.getElementById('screenEkp').style.paddingTop = '0px';
-  }
+  const ekpRowVisible = ekpRow.style.display !== 'none';
+  ekpRow.style.bottom = headerH + 'px'; // ставим строку "Матчи:" стопкой прямо над нижней навигацией
+  const ekpRowH = ekpRowVisible ? ekpRow.offsetHeight : 0;
+  document.getElementById('mainWrap').style.paddingBottom = (headerH + ekpRowH + 16) + 'px';
 }
 window.addEventListener('resize', layoutFixedBars);
 // ResizeObserver отслеживает сами фиксированные бары и пересчитывает отступы при ЛЮБОМ
@@ -1144,7 +1141,7 @@ function updateGotoEkpBtn(comp){
    status — одно из: 'МРС' | 'ВС' | 'МЕЖД' (единственные уровни, которые вообще попадают в ЕКП). */
 let ekpEvents = null;
 let ekpLoading = false;
-const ekpFilter = { status: new Set(), weapon: new Set(), ctype: null };
+const ekpFilter = { status: new Set(['МРС','ВС','МЕЖД']), weapon: new Set(), ctype: null };
 let ekpCompact = true;
 let ekpHidePast = false;
 
@@ -1205,13 +1202,13 @@ document.getElementById('ekpHidePastToggle').addEventListener('click', ()=>{
   renderEkpList();
 });
 
-// при переключении полный/сокращённый вид запоминаем, какое событие сейчас видно первым
-// под прилипшими шапками, и после перерисовки прокручиваем обратно к нему
+// при переключении полный/сокращённый вид запоминаем, какое событие сейчас видно
+// первым сверху экрана, и после перерисовки прокручиваем обратно к нему без анимации —
+// иначе список визуально "уезжает", пока браузер плавно долистывает до нужной точки
 document.getElementById('ekpViewToggle').addEventListener('click', ()=>{
-  const stickyBottom = document.getElementById('fixedEkpRow').getBoundingClientRect().bottom;
   let anchorId = null;
   document.querySelectorAll('#ekpList [data-ekp-id]').forEach(el=>{
-    if(anchorId===null && el.getBoundingClientRect().bottom > stickyBottom) anchorId = el.dataset.ekpId;
+    if(anchorId===null && el.getBoundingClientRect().bottom > 0) anchorId = el.dataset.ekpId;
   });
   ekpCompact = !ekpCompact;
   document.querySelector('#ekpViewToggle .tgl-compact').style.display = ekpCompact ? '' : 'none';
@@ -1238,7 +1235,7 @@ function ekpDateLabel(iso){
 function renderEkpList(){
   if(!ekpEvents) return;
   let list = ekpEvents;
-  if(ekpFilter.status.size) list = list.filter(ev=>ekpFilter.status.has(ev.status));
+  list = list.filter(ev=>ekpFilter.status.has(ev.status));
   if(ekpFilter.weapon.size) list = list.filter(ev=>ev.weapons.some(w=>ekpFilter.weapon.has(w)));
   if(ekpFilter.ctype) list = list.filter(ev=>ev.ctype===ekpFilter.ctype);
   if(ekpHidePast) list = list.filter(ev=>ekpDayState(ev)!=='past');
