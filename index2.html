@@ -152,6 +152,7 @@
   .chip{ appearance:none; border:1px solid var(--line); background:var(--panel-2); color:var(--text);
     font-size:0.78rem; padding:6px 12px; border-radius:14px; cursor:pointer; font-family:inherit; white-space:nowrap; }
   .chip.active{ background:var(--brass); border-color:var(--brass); color:#191410; font-weight:700; }
+  .chip.chip-partial{ background:var(--brass-dim); border-color:var(--brass-dim); color:var(--text); font-weight:700; }
   .ekp-view-toggle{ appearance:none; border:1px solid var(--line); background:var(--panel-2); border-radius:8px;
     padding:4px; display:flex; gap:3px; cursor:pointer; flex:none; align-items:center; justify-content:center; width:34px; height:34px; }
   .ekp-view-toggle svg{ width:18px; height:18px; color:var(--text-dim); }
@@ -321,7 +322,7 @@
       <p><i>В приложении вместо диапазона мест, которые необходимо занять на матче, мы указываем «не ниже N места» (формально, это не соответствует нормативной базе).</i></p>
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
-      <p>— На статусе «Другие всероссийские соревнования» для огнестрельного пистолета норматив допускает выполнение требований в категории юноши/девушки (11-15 лет), но не предусматривает такой возможности для юниоров/юниорок (16-20 лет) — притом что юниоры старше и в остальных случаях требования к младшим возрастным категориям как минимум не мягче, чем к старшим. Похоже на техническую недоработку при составлении документа.</p>
+      <p>— Для соревнований со статусом «Другие всероссийские соревнования» нормативка допускает выполнение требований в огнестрельных дисциплинах возрастной категорией юноши/девушки (11–15 лет), но не предусматривает такой возможности для юниоров/юниорок (16–20 лет). Хотя требования к младшим возрастным категориям обычно не мягче, чем к старшим.</p>
       <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v33-test</p>
       <div style="border-top:1px solid var(--line); margin-top:14px; padding-top:14px;">
         <span class="field-label" style="margin-bottom:10px;">Документы офлайн</span>
@@ -330,7 +331,7 @@
           <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/pravila-vida-sporta.pdf" target="_blank" rel="noopener">Правила вида спорта (PDF)</a>
           <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/normy-trebovania-uslovia.xlsx" target="_blank" rel="noopener">Нормы, требования и условия (XLSX)</a>
         </div>
-        <div class="field-note">Открываются на месте (без сохранения в файлы устройства). PDF откроются во встроенном просмотрщике; XLSX браузер может предложить сохранить отдельно — это ограничение самого браузера, не приложения.</div>
+
       </div>
     </div>
   </div>
@@ -578,11 +579,21 @@ function layoutFixedBars(){
   const ekpRow = document.getElementById('fixedEkpRow');
   ekpRow.style.top = headerH + 'px';
   if(ekpRow.style.display !== 'none'){
-    const ekpRowH = ekpRow.offsetHeight;
-    document.getElementById('screenEkp').style.paddingTop = (ekpRowH + 16) + 'px';
+    document.getElementById('screenEkp').style.paddingTop = ekpRow.offsetHeight + 'px';
+  } else {
+    document.getElementById('screenEkp').style.paddingTop = '0px';
   }
 }
 window.addEventListener('resize', layoutFixedBars);
+// ResizeObserver отслеживает сами фиксированные бары и пересчитывает отступы при ЛЮБОМ
+// изменении их размера (чипсы дорисовались асинхронно, перенос строки на маленьком экране
+// и т.д.) — без этого пересчёт мог не успеть сработать до того, как контент уже отрисован
+// со старым (недостаточным) отступом.
+if(window.ResizeObserver){
+  const roFixedBars = new ResizeObserver(()=>layoutFixedBars());
+  roFixedBars.observe(document.getElementById('fixedHeader'));
+  roFixedBars.observe(document.getElementById('fixedEkpRow'));
+}
 
 function switchTab(name){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
@@ -1094,6 +1105,23 @@ function render(){
 const EKP_GROUPS = ['interregional','allrussian','international'];
 const GROUP_TO_EKP_STATUS = { interregional:'МРС', allrussian:'ВС', international:'МЕЖД' };
 const APP_WEAPON_TO_EKP = { pistol:['Пистолет'], revolver:['Револьвер'], rifle:['Карабин','КПК','Ружьё','Троеборье'], pneumatic:['Пневматика'] };
+// Точное сопоставление id статуса из "Требования" с реальным текстом "Тип соревнований" в ЕКП —
+// нужно, чтобы переход между вкладками бил не просто в широкую группу (МРС/ВС/МЕЖД), а в
+// конкретный вид соревнования, если он есть в календаре. У Москвы/СПб и обычных региональных/
+// муниципальных статусов соответствия нет (их вообще нет в ЕКП) — для них просто null.
+const COMP_ID_TO_EKP_CTYPE = {
+  russia_champ: 'Чемпионат России',
+  russia_cup: 'Финал Кубка России (ФКР)',
+  allru_other: 'Всероссийское соревнование (кроме ЧР и ФКР)',
+  fo_champ: 'Чемпионат федерального округа',
+  fo_junior: 'Первенство федерального округа',
+  russia_junior: 'Первенство России',
+  world_champ: 'Другие международные соревнования',
+  europe_champ: 'Другие международные соревнования',
+  world_junior: 'Другие международные соревнования',
+  europe_junior: 'Другие международные соревнования',
+  intl_other: 'Другие международные соревнования',
+};
 function updateGotoEkpBtn(comp){
   const btn = document.getElementById('gotoEkpBtn');
   if(comp && !comp.blocked && EKP_GROUPS.includes(comp.group)){
@@ -1101,6 +1129,7 @@ function updateGotoEkpBtn(comp){
     btn.onclick = ()=>{
       ekpFilter.status = new Set([GROUP_TO_EKP_STATUS[comp.group]]);
       ekpFilter.weapon = new Set(APP_WEAPON_TO_EKP[state.weapon] || []);
+      ekpFilter.ctype = COMP_ID_TO_EKP_CTYPE[comp.id] || null;
       switchTab('ekp');
       ensureEkpLoaded().then(()=>{ renderEkpChips(); renderEkpList(); });
     };
@@ -1115,7 +1144,7 @@ function updateGotoEkpBtn(comp){
    status — одно из: 'МРС' | 'ВС' | 'МЕЖД' (единственные уровни, которые вообще попадают в ЕКП). */
 let ekpEvents = null;
 let ekpLoading = false;
-const ekpFilter = { status: new Set(), weapon: new Set() };
+const ekpFilter = { status: new Set(), weapon: new Set(), ctype: null };
 let ekpCompact = true;
 let ekpHidePast = false;
 
@@ -1144,9 +1173,11 @@ async function ensureEkpLoaded(){
 
 function renderEkpChips(){
   const statusEl = document.getElementById('ekpStatusChips');
-  statusEl.innerHTML = EKP_STATUSES.map(s=>
-    `<button class="chip${ekpFilter.status.has(s)?' active':''}" data-ekp-status="${s}">${s}</button>`
-  ).join('');
+  statusEl.innerHTML = EKP_STATUSES.map(s=>{
+    let cls = '';
+    if(ekpFilter.status.has(s)) cls = ekpFilter.ctype ? ' chip-partial' : ' active';
+    return `<button class="chip${cls}" data-ekp-status="${s}">${s}</button>`;
+  }).join('');
   const weaponEl = document.getElementById('ekpWeaponChips');
   weaponEl.innerHTML = EKP_WEAPONS.map(w=>
     `<button class="chip${ekpFilter.weapon.has(w)?' active':''}" data-ekp-weapon="${w}">${w}</button>`
@@ -1157,12 +1188,14 @@ document.getElementById('ekpStatusChips').addEventListener('click', (e)=>{
   const b = e.target.closest('[data-ekp-status]'); if(!b) return;
   const v = b.dataset.ekpStatus;
   ekpFilter.status.has(v) ? ekpFilter.status.delete(v) : ekpFilter.status.add(v);
+  ekpFilter.ctype = null;
   renderEkpChips(); renderEkpList();
 });
 document.getElementById('ekpWeaponChips').addEventListener('click', (e)=>{
   const b = e.target.closest('[data-ekp-weapon]'); if(!b) return;
   const v = b.dataset.ekpWeapon;
   ekpFilter.weapon.has(v) ? ekpFilter.weapon.delete(v) : ekpFilter.weapon.add(v);
+  ekpFilter.ctype = null;
   renderEkpChips(); renderEkpList();
 });
 document.getElementById('ekpStatusInfoBtn').addEventListener('click', ()=>openExplain('ekp_info'));
@@ -1207,6 +1240,7 @@ function renderEkpList(){
   let list = ekpEvents;
   if(ekpFilter.status.size) list = list.filter(ev=>ekpFilter.status.has(ev.status));
   if(ekpFilter.weapon.size) list = list.filter(ev=>ev.weapons.some(w=>ekpFilter.weapon.has(w)));
+  if(ekpFilter.ctype) list = list.filter(ev=>ev.ctype===ekpFilter.ctype);
   if(ekpHidePast) list = list.filter(ev=>ekpDayState(ev)!=='past');
   list = list.slice().sort((a,b)=> new Date(a.start) - new Date(b.start));
 
@@ -1251,7 +1285,8 @@ document.getElementById('ekpList').addEventListener('click', async (e)=>{
   await loadAndRender(); // подгружает данные под новое оружие и уже вызывает recomputeCategoryAndRender -> populateCompetitions -> render
 
   const list = currentPrograms();
-  const match = list.find(c=>c.group===targetGroup);
+  const match = list.find(c=>c.group===targetGroup && COMP_ID_TO_EKP_CTYPE[c.id]===ev.ctype)
+             || list.find(c=>c.group===targetGroup);
   if(match){
     state.comp = match.id; state.compLabel = match.label;
     document.getElementById('compUnavailableNote').style.display = 'none';
