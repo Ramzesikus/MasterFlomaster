@@ -125,15 +125,21 @@
     color:var(--text); font-family:inherit; font-size:0.92rem; padding:11px 12px; margin-top:8px; }
   .stars-input:focus{ outline:2px solid var(--brass); outline-offset:1px; }
 
-  /* ===== ТАБЫ ЭКРАНОВ (прилипают к верху) ===== */
-  .tab-bar-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; border-bottom:1px solid var(--line);
-    position:sticky; top:0; background:var(--bg); z-index:20; padding-top:10px; }
+  /* ===== ФИКСИРОВАННАЯ ШАПКА (табы + иконки) — настоящий fixed, не sticky:
+     sticky сначала едет вместе с контентом и лишь потом "прилипает", это не подходит,
+     когда нужна стопроцентная неподвижность с самого начала. Высоту меряем в JS и
+     проставляем как отступ контенту — жёстко прописанные пиксели ненадёжны на разных
+     телефонах/шрифтах. ===== */
+  .fixed-header{ position:fixed; top:0; left:0; right:0; background:var(--bg); z-index:30; }
+  .tab-bar-row{ display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line);
+    max-width:560px; margin:0 auto; padding:10px 16px 10px; }
   .tab-bar{ display:flex; gap:18px; }
   .tab-btn{ appearance:none; border:none; border-bottom:2px solid transparent; background:none; color:var(--text-dim);
     font-size:0.92rem; font-weight:700; padding:9px 2px 10px; cursor:pointer; font-family:inherit; margin-bottom:-1px; }
   .tab-btn.active{ color:var(--brass); border-bottom-color:var(--brass); }
-  .tab-bar-row .head-icons{ margin-left:0; margin-bottom:8px; }
-  .ekp-sticky-row{ position:sticky; top:41px; background:var(--bg); z-index:19; padding:10px 0 12px; margin-bottom:0 !important; }
+  .tab-bar-row .head-icons{ margin-left:0; }
+  .fixed-ekp-row{ position:fixed; left:0; right:0; background:var(--bg); z-index:29; border-bottom:1px solid var(--line); }
+  .fixed-ekp-row .ekp-toprow{ max-width:560px; margin:0 auto; padding:10px 16px 12px; }
 
   /* ===== ССЫЛКА НА ЕКП ИЗ ТРЕБОВАНИЙ ===== */
   .ekp-link-btn{ appearance:none; border:none; background:none; color:var(--brass); font-size:0.82rem;
@@ -177,8 +183,7 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-
+<div class="fixed-header" id="fixedHeader">
   <div class="tab-bar-row">
     <div class="tab-bar" id="tabBar">
       <button class="tab-btn active" data-tab="req">Требования</button>
@@ -196,6 +201,9 @@
       </button>
     </div>
   </div>
+</div>
+
+<div class="wrap" id="mainWrap">
 
   <div id="screenReq">
   <span class="result-eyebrow" style="color:var(--brass); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; margin:6px 2px 10px; display:block;">Кто я и что хочу?</span>
@@ -269,23 +277,26 @@
   </div>
 
   <div id="screenEkp" style="display:none;">
-    <div class="ekp-toprow ekp-sticky-row">
-      <span style="font-size:12px; color:var(--text-dim); flex:none;">Матчи:</span>
-      <div class="chip-row" id="ekpStatusChips" style="flex:1;"></div>
-      <button class="q-btn" id="ekpStatusInfoBtn" type="button">?</button>
-      <button class="ekp-view-toggle" id="ekpHidePastToggle" type="button" aria-label="Не показывать прошедшие">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
-      </button>
-      <button class="ekp-view-toggle" id="ekpViewToggle" type="button" aria-label="Переключить вид">
-        <span class="tgl-icon tgl-compact"><i></i><i></i><i></i></span>
-        <span class="tgl-icon tgl-full" style="display:none;"><i></i><i></i></span>
-      </button>
-    </div>
     <div class="ekp-divider"></div>
     <div class="chip-row" id="ekpWeaponChips" style="margin-bottom:16px;"></div>
     <div id="ekpList"></div>
   </div>
 
+</div>
+
+<div class="fixed-ekp-row" id="fixedEkpRow" style="display:none;">
+  <div class="ekp-toprow">
+    <span style="font-size:12px; color:var(--text-dim); flex:none;">Матчи:</span>
+    <div class="chip-row" id="ekpStatusChips" style="flex:1;"></div>
+    <button class="q-btn" id="ekpStatusInfoBtn" type="button">?</button>
+    <button class="ekp-view-toggle" id="ekpHidePastToggle" type="button" aria-label="Не показывать прошедшие">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+    </button>
+    <button class="ekp-view-toggle" id="ekpViewToggle" type="button" aria-label="Переключить вид">
+      <span class="tgl-icon tgl-compact"><i></i><i></i><i></i></span>
+      <span class="tgl-icon tgl-full" style="display:none;"><i></i><i></i></span>
+    </button>
+  </div>
 </div>
 
 <!-- ===== INFO MODAL ===== -->
@@ -310,15 +321,16 @@
       <p><i>В приложении вместо диапазона мест, которые необходимо занять на матче, мы указываем «не ниже N места» (формально, это не соответствует нормативной базе).</i></p>
       <p>— ЕВСК и Правила вида спорта задают разные минимальные возрасты допуска к соревнованиям, на которых присваиваются разряды/звания: пистолет — 13 лет по ЕВСК против 14 лет по Правилам; револьвер — 13 лет по ЕВСК против 16 лет по Правилам. Отдельно для звания МСМК ЕВСК ужесточает возраст пистолета и револьвера до 15 лет вместо 13.</p>
       <p><i>В приложении по каждому виду оружия мы берём более строгое из двух правил — большее из двух минимальных значений.</i></p>
+      <p>— На статусе «Другие всероссийские соревнования» для огнестрельного пистолета норматив допускает выполнение требований в категории юноши/девушки (11-15 лет), но не предусматривает такой возможности для юниоров/юниорок (16-20 лет) — притом что юниоры старше и в остальных случаях требования к младшим возрастным категориям как минимум не мягче, чем к старшим. Похоже на техническую недоработку при составлении документа.</p>
       <p style="color:var(--text-dim); font-size:0.78rem;">Версия: v33-test</p>
       <div style="border-top:1px solid var(--line); margin-top:14px; padding-top:14px;">
         <span class="field-label" style="margin-bottom:10px;">Документы офлайн</span>
         <div class="btn-row" style="flex-direction:column;">
-          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/polozhenie-evsk.pdf" download>Положение о ЕВСК (PDF)</a>
-          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/pravila-vida-sporta.pdf" download>Правила вида спорта (PDF)</a>
-          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/normy-trebovania-uslovia.xlsx" download>Нормы, требования и условия (XLSX)</a>
+          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/polozhenie-evsk.pdf" target="_blank" rel="noopener">Положение о ЕВСК (PDF)</a>
+          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/pravila-vida-sporta.pdf" target="_blank" rel="noopener">Правила вида спорта (PDF)</a>
+          <a class="opt-btn" style="text-align:left; text-decoration:none;" href="docs/normy-trebovania-uslovia.xlsx" target="_blank" rel="noopener">Нормы, требования и условия (XLSX)</a>
         </div>
-        <div class="field-note">Скачиваются один раз и остаются на устройстве — дальше открываются без интернета.</div>
+        <div class="field-note">Открываются на месте (без сохранения в файлы устройства). PDF откроются во встроенном просмотрщике; XLSX браузер может предложить сохранить отдельно — это ограничение самого браузера, не приложения.</div>
       </div>
     </div>
   </div>
@@ -452,7 +464,7 @@ let tg = null;
 try{ tg = window.Telegram && window.Telegram.WebApp; if(tg){ tg.ready(); tg.expand(); } }catch(e){}
 
 /* ============ СВЯЗЬ С ВОРКЕРОМ (данные + аналитика — один и тот же адрес) ============ */
-const RELAY_URL = "https://master-flomaster-relay-test.khristoforov-ra.workers.dev";
+const RELAY_URL = "https://master-flomaster-relay.khristoforov-ra.workers.dev";
 const APP_SECRET = "MasterFlomasterSecret";
 const APP_VERSION = "v33-test";
 
@@ -560,11 +572,25 @@ document.getElementById('targetInfoBtn').addEventListener('click', ()=>openExpla
 document.getElementById('compInfoBtn').addEventListener('click', ()=>openExplain('comp_info'));
 
 /* ============ ТАБЫ ЭКРАНОВ ============ */
+function layoutFixedBars(){
+  const headerH = document.getElementById('fixedHeader').offsetHeight;
+  document.getElementById('mainWrap').style.paddingTop = (headerH + 16) + 'px';
+  const ekpRow = document.getElementById('fixedEkpRow');
+  ekpRow.style.top = headerH + 'px';
+  if(ekpRow.style.display !== 'none'){
+    const ekpRowH = ekpRow.offsetHeight;
+    document.getElementById('screenEkp').style.paddingTop = (ekpRowH + 16) + 'px';
+  }
+}
+window.addEventListener('resize', layoutFixedBars);
+
 function switchTab(name){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
   document.getElementById('screenReq').style.display = name==='req' ? '' : 'none';
   document.getElementById('screenEkp').style.display = name==='ekp' ? '' : 'none';
+  document.getElementById('fixedEkpRow').style.display = name==='ekp' ? '' : 'none';
   if(name==='ekp') ensureEkpLoaded();
+  layoutFixedBars();
 }
 document.getElementById('tabBar').addEventListener('click', (e)=>{
   const b = e.target.closest('.tab-btn'); if(!b) return;
@@ -1113,6 +1139,7 @@ async function ensureEkpLoaded(){
   ekpLoading = false;
   renderEkpChips();
   renderEkpList();
+  layoutFixedBars();
 }
 
 function renderEkpChips(){
@@ -1148,7 +1175,7 @@ document.getElementById('ekpHidePastToggle').addEventListener('click', ()=>{
 // при переключении полный/сокращённый вид запоминаем, какое событие сейчас видно первым
 // под прилипшими шапками, и после перерисовки прокручиваем обратно к нему
 document.getElementById('ekpViewToggle').addEventListener('click', ()=>{
-  const stickyBottom = document.querySelector('.ekp-sticky-row').getBoundingClientRect().bottom;
+  const stickyBottom = document.getElementById('fixedEkpRow').getBoundingClientRect().bottom;
   let anchorId = null;
   document.querySelectorAll('#ekpList [data-ekp-id]').forEach(el=>{
     if(anchorId===null && el.getBoundingClientRect().bottom > stickyBottom) anchorId = el.dataset.ekpId;
@@ -1247,6 +1274,7 @@ function showLoadError(){
 /* ============ ИНИЦИАЛИЗАЦИЯ ============ */
 async function boot(){
   showSpinner('Загружаю приложение...');
+  layoutFixedBars();
   try{
     const saved = await loadParams();
     applySavedParams(saved);
